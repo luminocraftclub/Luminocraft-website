@@ -595,10 +595,11 @@ async function handleSubmit(){
       document.getElementById('successState').style.display = 'block';
       window.scrollTo({top:0,behavior:'smooth'});
     } else {
-      throw new Error(await res.text());
+      const errText = await res.text();
+      throw new Error(`Supabase ${res.status}: ${errText}`);
     }
   } catch(e){
-    errorEl.textContent = '⚠️ Something went wrong. Please try again or email us at luminocraftclub@gmail.com';
+    errorEl.textContent = `⚠️ Error: ${e.message}`;
     errorEl.style.display = 'block';
     btn.textContent = '🎂 Submit Birthday Party Booking';
     btn.disabled = false;
