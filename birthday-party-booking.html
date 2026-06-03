@@ -7,6 +7,8 @@
 <title>Book a Birthday Party – Lumino Craft ✨</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>emailjs.init('sd_4XI5dDON_6xXBY');</script>
 <style>
 :root{
   --teal:#3BBFB8;--teal-d:#2A9E98;--teal-l:#E0F5F4;
@@ -253,8 +255,12 @@ footer{background:#1C2E2C;color:rgba(255,255,255,.5);text-align:center;padding:2
             <input type="text" id="childName" placeholder="Emma" required/>
           </div>
           <div class="form-row">
-            <label>Child's Date of Birth <span class="req">*</span></label>
-            <input type="date" id="childDob" required/>
+            <label>Child's Age Group <span class="req">*</span></label>
+            <select id="childAgeGroup" required>
+              <option value="">— Select —</option>
+              <option value="0–2 years">👶 0–2 years</option>
+              <option value="2–4 years">🧒 2–4 years</option>
+            </select>
           </div>
         </div>
       </div>
@@ -518,7 +524,7 @@ async function handleSubmit(){
     { id:'phone', label:'Phone number' },
     { id:'email', label:'Email address' },
     { id:'childName', label:"Child's name" },
-    { id:'childDob', label:"Child's date of birth" },
+    { id:'childAgeGroup', label:"Child's age group" },
     { id:'venue', label:'Venue' },
     { id:'preferredDate', label:'Preferred date' },
     { id:'numChildren', label:'Number of children' },
@@ -557,6 +563,7 @@ async function handleSubmit(){
     phone_number: document.getElementById('phone').value.trim(),
     email: document.getElementById('email').value.trim(),
     child_name: document.getElementById('childName').value.trim(),
+    child_age_group: document.getElementById('childAgeGroup').value,
     venue: document.getElementById('venue').value,
     preferred_date: document.getElementById('preferredDate').value,
     num_children: document.getElementById('numChildren').value,
@@ -580,11 +587,30 @@ async function handleSubmit(){
     });
 
     if(res.ok){
+      // Send EmailJS notification
+      try{
+        await emailjs.send('service_d8fxchy', 'template_cw6mu4f', {
+          parent_name:    payload.parent_name,
+          email:          payload.email,
+          phone_number:   payload.phone_number,
+          child_name:     payload.child_name,
+          child_age_group: payload.child_age_group,
+          venue:          payload.venue,
+          preferred_date: payload.preferred_date,
+          theme:          payload.theme,
+          mess_level:     payload.mess_level,
+          num_children:   payload.num_children,
+          allergies_notes: payload.allergies_notes || 'None',
+        });
+      } catch(emailErr){
+        console.warn('EmailJS failed:', emailErr);
+      }
+
       // Show summary
       document.getElementById('bookingSummary').innerHTML = `
         <strong>📋 Booking Summary</strong><br>
         👤 <span>${payload.parent_name}</span><br>
-        👶 <span>${payload.child_name}</span><br>
+        👶 <span>${payload.child_name} (${payload.child_age_group})</span><br>
         📍 <span>${payload.venue}</span><br>
         📅 <span>${payload.preferred_date}</span><br>
         🎨 Theme: <span>${payload.theme}</span><br>
