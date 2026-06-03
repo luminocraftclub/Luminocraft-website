@@ -589,7 +589,7 @@ async function handleSubmit(){
     if(res.ok){
       // Send EmailJS notification
       try{
-        await emailjs.send('service_d8fxchy', 'template_cw6mu4f', {
+        const emailRes = await emailjs.send('service_d8fxchy', 'template_cw6mu4f', {
           parent_name:    payload.parent_name,
           email:          payload.email,
           phone_number:   payload.phone_number,
@@ -602,8 +602,11 @@ async function handleSubmit(){
           num_children:   payload.num_children,
           allergies_notes: payload.allergies_notes || 'None',
         });
+        console.log('EmailJS success:', emailRes);
       } catch(emailErr){
         console.warn('EmailJS failed:', emailErr);
+        errorEl.textContent = `⚠️ Booking saved but email failed: ${JSON.stringify(emailErr)}`;
+        errorEl.style.display = 'block';
       }
 
       // Show summary
