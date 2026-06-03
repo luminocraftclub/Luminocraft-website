@@ -793,7 +793,7 @@ async function handleSubmit(){
   // Build payload
   const payload = {
     parent_name: document.getElementById("parentName").value.trim(),
-    phone_number: document.getElementById("phone").value.trim(),
+    phone: document.getElementById("phone").value.trim(),
     email: document.getElementById("email").value.trim(),
     child_name: document.getElementById("childName").value.trim(),
     child_dob: document.getElementById("childDob").value,
@@ -801,12 +801,12 @@ async function handleSubmit(){
     preferred_date: selectedDate,
     allergies_notes: document.getElementById("notes").value.trim(),
     first_time: isFirstTime,
-    wavier_accepted: primaryAgreed,
+    waiver_accepted: primaryAgreed,
     photo_consent: primaryPhotoConsent === 'yes',
     friend_parent_name: isFirstTime ? friendParent : null,
     friend_email: isFirstTime ? document.getElementById("friendEmail").value.trim() : null,
     friend_child_name: isFirstTime ? document.getElementById("friendChildName").value.trim() : null,
-    friend_child_DOB: isFirstTime && document.getElementById("friendChildDob").value ? document.getElementById("friendChildDob").value : null,
+    friend_child_dob: isFirstTime && document.getElementById("friendChildDob").value ? document.getElementById("friendChildDob").value : null,
     friend_wavier_accepted: isFirstTime && friendParent ? friendAgreed : false,
     friend_photo_consent: isFirstTime && friendParent ? friendPhotoConsent === 'yes' : false,
   };
@@ -860,7 +860,7 @@ async function handleSubmit(){
     window.scrollTo({top:0,behavior:"smooth"});
 
   } catch(e){
-    errorEl.textContent = "⚠️ Something went wrong. Please try again or email us at luminocraftclub@gmail.com";
+    errorEl.textContent = `⚠️ Error: ${e.message}`;
     errorEl.style.display = "block";
     btn.textContent = "🎉 Register & Proceed to Payment";
     btn.disabled = false;
