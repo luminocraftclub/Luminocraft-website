@@ -853,7 +853,8 @@ async function handleSubmit(){
         friend_photo_consent: isFirstTime && friendParent ? (friendPhotoConsent === 'yes' ? "Yes" : "No") : "N/A",
       });
     } catch(emailErr){
-      console.warn("EmailJS failed:", emailErr); // Non-fatal — registration still saved
+      errorEl.textContent = `⚠️ Booking saved but email failed: ${JSON.stringify(emailErr)}`;
+      errorEl.style.display = "block";
     }
 
     // Show success
