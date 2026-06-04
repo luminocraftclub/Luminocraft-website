@@ -598,7 +598,7 @@ makeStars("navStars",20);
 makeStars("footerStars",50);
 
 // ── AGE / SLOT LOGIC ──────────────────────────────────────────
-// Slots: 0–11 months → 10:30–11:30 AM  |  12–23 months → 12:00–1:00 PM
+// Slots: 0–11 months → 10:30-11:30 AM  |  12–23 months → 12:00-1:00 PM
 let cachedDates = [];   // raw rows from Supabase
 let currentAgeGroup = null;  // "infant" | "toddler" | null
 
@@ -651,8 +651,8 @@ function buildDateOptions(ageGroup){
   } else {
     // DOB entered — show dates with the correct time slot for their age group
     const slot = ageGroup === "infant"
-                 ? "10:30–11:30 AM"
-                 : "12:00–1:00 PM";
+                 ? "10:30-11:30 AM"
+                 : "12:00-1:00 PM";
     const suffix = ageGroup === "infant" ? "_1030" : "_1200";
     cachedDates.forEach(d => {
       const opt = document.createElement("option");
@@ -684,12 +684,12 @@ function onDobChange(){
 
   if(ageGroup === "infant"){
     badge.className = "slot-badge infant";
-    badge.innerHTML = "🌙 <strong>0–11 months</strong> · Your slot: <strong>10:30–11:30 AM</strong><br>"
+    badge.innerHTML = "🌙 <strong>0–11 months</strong> · Your slot: <strong>10:30-11:30 AM</strong><br>"
                     + "<span style='font-size:.74rem;opacity:.8;'>Dates below show only the morning session for your age group.</span>";
     badge.style.display = "block";
   } else if(ageGroup === "toddler"){
     badge.className = "slot-badge toddler";
-    badge.innerHTML = "🌟 <strong>12–23 months</strong> · Your slot: <strong>12:00–1:00 PM</strong><br>"
+    badge.innerHTML = "🌟 <strong>12–23 months</strong> · Your slot: <strong>12:00-1:00 PM</strong><br>"
                     + "<span style='font-size:.74rem;opacity:.8;'>Dates below show only the midday session for your age group.</span>";
     badge.style.display = "block";
   } else if(ageGroup === "over"){
@@ -739,7 +739,7 @@ async function checkDateCapacity(dateVal){
   if(!dateVal) return;
   // Build the full slot string that gets stored in preferred_date
   const date = dateVal.split("_")[0];
-  const slot = dateVal.endsWith("_1030") ? "10:30–11:30 AM" : "12:00–1:00 PM";
+  const slot = dateVal.endsWith("_1030") ? "10:30-11:30 AM" : "12:00-1:00 PM";
   // If no DOB entered yet, dateVal has no suffix — just use date only for a rough check
   const queryVal = dateVal.includes("_")
     ? `${date} ${slot}`
@@ -903,7 +903,7 @@ async function handleSubmit(){
   // Final per-slot capacity check before submitting
   const selectedDateVal = document.getElementById("preferredDate").value;
   const selectedDate    = selectedDateVal.split("_")[0];
-  const selectedSlot    = selectedDateVal.endsWith("_1030") ? "10:30–11:30 AM" : "12:00–1:00 PM";
+  const selectedSlot    = selectedDateVal.endsWith("_1030") ? "10:30-11:30 AM" : "12:00-1:00 PM";
   const fullSlotStr     = selectedDate + " " + selectedSlot;
   try{
     const capRes = await fetch(
