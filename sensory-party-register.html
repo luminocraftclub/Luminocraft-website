@@ -939,7 +939,7 @@ async function handleSubmit(){
     friend_parent_name: isFirstTime ? friendParent : null,
     friend_email: isFirstTime ? document.getElementById("friendEmail").value.trim() : null,
     friend_child_name: isFirstTime ? document.getElementById("friendChildName").value.trim() : null,
-    friend_child_DOB: isFirstTime && document.getElementById("friendChildDob").value ? document.getElementById("friendChildDob").value : null,
+    friend_child_dob: isFirstTime && document.getElementById("friendChildDob").value ? document.getElementById("friendChildDob").value : null,
     friend_wavier_accepted: isFirstTime && friendParent ? friendAgreed : false,
     friend_photo_consent: isFirstTime && friendParent ? friendPhotoConsent === 'yes' : false,
   };
@@ -979,7 +979,7 @@ async function handleSubmit(){
         friend_parent_name:   payload.friend_parent_name || "N/A",
         friend_email:         payload.friend_email || "N/A",
         friend_child_name:    payload.friend_child_name || "N/A",
-        friend_child_dob:     payload.friend_child_DOB || "N/A",
+        friend_child_dob:     payload.friend_child_dob || "N/A",
         friend_waiver_accepted: isFirstTime && friendParent ? "Yes" : "N/A",
         friend_photo_consent: isFirstTime && friendParent ? (friendPhotoConsent === 'yes' ? "Yes" : "No") : "N/A",
       });
