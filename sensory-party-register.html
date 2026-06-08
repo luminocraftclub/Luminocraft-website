@@ -739,7 +739,7 @@ async function checkDateCapacity(dateVal){
   if(!dateVal) return;
   // Build the full slot string that gets stored in preferred_date
   const date = dateVal.split("_")[0];
-  const slot = dateVal.endsWith("_1030") ? "10:30-11:30 AM" : "12:00-1:00 PM";
+  const slot = dateVal.endsWith("_1030") ? "10:30-11:30 AM" : "12:00–1:00 PM";
   // If no DOB entered yet, dateVal has no suffix — just use date only for a rough check
   const queryVal = dateVal.includes("_")
     ? `${date} ${slot}`
