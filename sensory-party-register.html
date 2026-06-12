@@ -397,9 +397,13 @@ footer{background:#1C2E2C;color:rgba(255,255,255,.5);
               <input type="text" id="friendParentName" placeholder="Jane Doe"/>
             </div>
             <div class="form-row">
-              <label>Friend's Email</label>
-              <input type="email" id="friendEmail" placeholder="jane@example.com"/>
+              <label>Friend's Phone Number</label>
+              <input type="tel" id="friendPhone" placeholder="778-555-0123"/>
             </div>
+          </div>
+          <div class="form-row">
+            <label>Friend's Email</label>
+            <input type="email" id="friendEmail" placeholder="jane@example.com"/>
           </div>
           <div class="form-grid">
             <div class="form-row">
@@ -979,6 +983,7 @@ async function handleSubmit(){
     photo_consent: primaryPhotoConsent === 'yes',
     friend_parent_name: isFirstTime ? friendParent : null,
     friend_email: isFirstTime ? document.getElementById("friendEmail").value.trim() : null,
+    friend_phone: isFirstTime ? document.getElementById("friendPhone").value.trim() : null,
     friend_child_name: isFirstTime ? document.getElementById("friendChildName").value.trim() : null,
     friend_child_dob: isFirstTime && document.getElementById("friendChildDob").value ? document.getElementById("friendChildDob").value : null,
     friend_waiver_accepted: isFirstTime && friendParent ? friendAgreed : false,
