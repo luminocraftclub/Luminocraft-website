@@ -144,7 +144,9 @@ nav{
 .month-btn.active{background:var(--teal);border-color:var(--teal);color:#fff;}
 
 /* SESSION CARDS */
-.session-card{
+#sessionCards{
+  display:none;flex-direction:column;gap:.6rem;
+}
   border:2px solid var(--border);border-radius:12px;
   padding:.75rem 1rem;cursor:pointer;
   background:#fff;transition:all .15s;
@@ -366,7 +368,7 @@ footer{background:#1C2E2C;color:rgba(255,255,255,.5);
         <div class="form-row">
           <label>Session Date &amp; Time <span class="req">*</span></label>
           <div id="monthFilter" style="display:none;flex-wrap:wrap;gap:.5rem;margin-bottom:.75rem;"></div>
-          <div id="sessionCards" style="display:none;flex-direction:column;gap:.6rem;"></div>
+          <div id="sessionCards"></div>
           <input type="hidden" id="preferredDate" required/>
         </div>
         <div class="form-row">
@@ -571,12 +573,12 @@ function buildDateOptions(){
     : cachedDates;
 
   if(filtered.length === 0){
-    container.style.display = 'flex';
+    container.style.cssText = 'display:flex;flex-direction:column;gap:.6rem;';
     container.innerHTML = '<p style="font-size:.82rem;color:var(--muted);font-weight:700;text-align:center;padding:.5rem 0;">No sessions this month — try another month</p>';
     return;
   }
 
-  container.style.display = 'flex';
+  container.style.cssText = 'display:flex;flex-direction:column;gap:.6rem;';
   filtered.forEach(d => {
     const slotTime = d.slot_time || "";
     const val = `${d.date}||${slotTime}`;
@@ -607,7 +609,7 @@ function buildDateOptions(){
 async function loadDates(venue){
   const container = document.getElementById("sessionCards");
   container.innerHTML = '';
-  container.style.display = 'none';
+  container.style.cssText = 'display:none;';
   document.getElementById("preferredDate").value = '';
   cachedDates = [];
 
