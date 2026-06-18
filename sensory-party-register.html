@@ -560,6 +560,15 @@ function buildMonthFilter(){
   activeMonth = months[0];
 }
 
+function formatDateLabel(dateStr){
+  const d = new Date(dateStr + "T12:00:00");
+  const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const months = ["January","February","March","April","May","June",
+                  "July","August","September","October","November","December"];
+  const nth = n => { const s=["th","st","nd","rd"],v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); };
+  return `${days[d.getDay()]}, ${nth(d.getDate())} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
 function buildDateOptions(){
   const container = document.getElementById("sessionCards");
   const hiddenInput = document.getElementById("preferredDate");
