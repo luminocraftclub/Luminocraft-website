@@ -134,6 +134,26 @@ nav{
 .radio-opt:has(input:checked){
   border-color:var(--teal);background:var(--teal-l);color:var(--teal-d);}
 
+/* MONTH FILTER */
+.month-btn{
+  font-family:"Fredoka One",cursive;font-size:.82rem;
+  padding:.38rem .9rem;border-radius:50px;border:2px solid var(--border);
+  background:#fff;color:var(--muted);cursor:pointer;transition:all .15s;
+}
+.month-btn:hover{border-color:var(--teal);color:var(--teal);}
+.month-btn.active{background:var(--teal);border-color:var(--teal);color:#fff;}
+
+/* MONTH FILTER */
+.month-btn{
+  padding:.38rem .9rem;border-radius:50px;border:2px solid var(--border);
+  background:#fff;color:var(--muted);font-size:.78rem;font-weight:800;
+  cursor:pointer;transition:all .15s;font-family:inherit;
+}
+.month-btn:hover{ border-color:var(--teal);color:var(--teal-d); }
+.month-btn.active{
+  background:var(--teal);border-color:var(--teal);color:#fff;
+}
+
 /* WAIVER SCROLL */
 .waiver-scroll{
   background:var(--bg);border:2px solid var(--border);
@@ -341,8 +361,9 @@ footer{background:#1C2E2C;color:rgba(255,255,255,.5);
         </div>
         <div class="form-row">
           <label>Session Date &amp; Time <span class="req">*</span></label>
+          <div id="monthFilter" style="display:none;flex-wrap:wrap;gap:.5rem;margin-bottom:.75rem;"></div>
           <select id="preferredDate" required onchange="checkDateCapacity(this.value)">
-            <option value="">— Select a date —</option>
+            <option value="">— Select a venue first —</option>
           </select>
         </div>
         <div class="form-row">
@@ -500,36 +521,59 @@ makeStars("navStars",20);
 makeStars("footerStars",50);
 
 // ── AGE / SLOT LOGIC ──────────────────────────────────────────
-// Slots: 0–11 months → 10:30-11:30 AM  |  12–23 months → 12:00-1:00 PM
-let cachedDates = [];   // raw rows from Supabase
-function formatDateLabel(dateStr){
-  const d = new Date(dateStr + "T12:00:00");
-  const days   = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  const months = ["January","February","March","April","May","June",
-                  "July","August","September","October","November","December"];
-  const nth = (n) => {
-    const s = ["th","st","nd","rd"];
-    const v = n % 100;
-    return n + (s[(v-20)%10] || s[v] || s[0]);
-  };
-  return `${days[d.getDay()]}, ${nth(d.getDate())} ${months[d.getMonth()]} ${d.getFullYear()}`;
+// LOAD SESSIONS FROM SUPABASE FOR SELECTED VENUE
+let cachedDates = [];
+let activeMonth = null;
+const MONTHS = ["January","February","March","April","May","June",
+                "July","August","September","October","November","December"];
+
+function buildMonthFilter(){
+  const filterEl = document.getElementById('monthFilter');
+  const months = [...new Set(cachedDates.map(d => d.date.slice(0,7)))].sort();
+  if(months.length <= 1){
+    filterEl.style.display = 'none';
+    activeMonth = months[0] || null;
+    return;
+  }
+  filterEl.style.display = 'flex';
+  filterEl.innerHTML = '';
+  months.forEach((m, i) => {
+    const [yr, mo] = m.split('-');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'month-btn' + (i === 0 ? ' active' : '');
+    btn.textContent = `${MONTHS[parseInt(mo)-1]} ${yr}`;
+    btn.dataset.month = m;
+    btn.onclick = () => {
+      document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeMonth = m;
+      buildDateOptions();
+      document.getElementById('preferredDate').value = '';
+      document.getElementById('capBar').style.display = 'none';
+    };
+    filterEl.appendChild(btn);
+  });
+  activeMonth = months[0];
 }
 
 function buildDateOptions(){
   const select = document.getElementById("preferredDate");
-  const current = select.value;
   select.innerHTML = '<option value="">— Select a session —</option>';
 
-  if(cachedDates.length === 0){
+  const filtered = activeMonth
+    ? cachedDates.filter(d => d.date.startsWith(activeMonth))
+    : cachedDates;
+
+  if(filtered.length === 0){
     const opt = document.createElement("option");
-    opt.value = "";
-    opt.disabled = true;
-    opt.textContent = "No upcoming sessions — check back soon!";
+    opt.value = ""; opt.disabled = true;
+    opt.textContent = "No sessions this month — try another month";
     select.appendChild(opt);
     return;
   }
 
-  cachedDates.forEach(d => {
+  filtered.forEach(d => {
     const opt = document.createElement("option");
     const slotTime = d.slot_time || "";
     opt.value = `${d.date}||${slotTime}`;
@@ -538,8 +582,6 @@ function buildDateOptions(){
       : formatDateLabel(d.date);
     select.appendChild(opt);
   });
-
-  if(current) select.value = current;
 }
 
 // LOAD SESSIONS FROM SUPABASE FOR SELECTED VENUE
@@ -559,10 +601,12 @@ async function loadDates(venue){
     if(!res.ok){ throw new Error("HTTP " + res.status); }
     const dates = await res.json();
     cachedDates = Array.isArray(dates) ? dates : [];
+    activeMonth = null;
   } catch(e){
     cachedDates = [];
     console.warn("loadDates error:", e);
   }
+  buildMonthFilter();
   buildDateOptions();
 }
 
