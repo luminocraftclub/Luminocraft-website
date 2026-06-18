@@ -559,19 +559,18 @@ function buildMonthFilter(){
 
 function buildDateOptions(){
   const select = document.getElementById("preferredDate");
-  select.innerHTML = '<option value="">— Select a session —</option>';
 
   const filtered = activeMonth
     ? cachedDates.filter(d => d.date.startsWith(activeMonth))
     : cachedDates;
 
   if(filtered.length === 0){
-    const opt = document.createElement("option");
-    opt.value = ""; opt.disabled = true;
-    opt.textContent = "No sessions this month — try another month";
-    select.appendChild(opt);
+    select.innerHTML = '<option value="">No sessions this month — try another</option>';
     return;
   }
+
+  const count = filtered.length;
+  select.innerHTML = `<option value="">👇 ${count} session${count > 1 ? 's' : ''} available — tap to choose</option>`;
 
   filtered.forEach(d => {
     const opt = document.createElement("option");
