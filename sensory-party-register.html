@@ -143,16 +143,20 @@ nav{
 .month-btn:hover{border-color:var(--teal);color:var(--teal);}
 .month-btn.active{background:var(--teal);border-color:var(--teal);color:#fff;}
 
-/* MONTH FILTER */
-.month-btn{
-  padding:.38rem .9rem;border-radius:50px;border:2px solid var(--border);
-  background:#fff;color:var(--muted);font-size:.78rem;font-weight:800;
-  cursor:pointer;transition:all .15s;font-family:inherit;
+/* SESSION CARDS */
+.session-card{
+  border:2px solid var(--border);border-radius:12px;
+  padding:.75rem 1rem;cursor:pointer;
+  background:#fff;transition:all .15s;
+  display:flex;align-items:center;justify-content:space-between;gap:.5rem;
 }
-.month-btn:hover{ border-color:var(--teal);color:var(--teal-d); }
-.month-btn.active{
-  background:var(--teal);border-color:var(--teal);color:#fff;
-}
+.session-card:active{ transform:scale(.98); }
+.session-card.selected{ border-color:var(--teal);background:var(--teal-l); }
+.session-card .s-date{ font-size:.88rem;font-weight:800;color:var(--ink); }
+.session-card .s-time{ font-size:.8rem;font-weight:700;color:var(--teal-d); }
+.session-card .s-label{ font-size:.72rem;font-weight:700;color:var(--muted);margin-top:.1rem; }
+.session-card .s-check{ font-size:1.1rem;opacity:0;transition:opacity .15s;flex-shrink:0; }
+.session-card.selected .s-check{ opacity:1; }
 
 /* WAIVER SCROLL */
 .waiver-scroll{
@@ -362,9 +366,8 @@ footer{background:#1C2E2C;color:rgba(255,255,255,.5);
         <div class="form-row">
           <label>Session Date &amp; Time <span class="req">*</span></label>
           <div id="monthFilter" style="display:none;flex-wrap:wrap;gap:.5rem;margin-bottom:.75rem;"></div>
-          <select id="preferredDate" required onchange="checkDateCapacity(this.value)">
-            <option value="">— Select a venue first —</option>
-          </select>
+          <div id="sessionCards" style="display:none;flex-direction:column;gap:.6rem;"></div>
+          <input type="hidden" id="preferredDate" required/>
         </div>
         <div class="form-row">
           <label>Allergies or Accessibility Needs</label>
@@ -549,8 +552,6 @@ function buildMonthFilter(){
       btn.classList.add('active');
       activeMonth = m;
       buildDateOptions();
-      document.getElementById('preferredDate').value = '';
-      document.getElementById('capBar').style.display = 'none';
     };
     filterEl.appendChild(btn);
   });
@@ -558,35 +559,56 @@ function buildMonthFilter(){
 }
 
 function buildDateOptions(){
-  const select = document.getElementById("preferredDate");
+  const container = document.getElementById("sessionCards");
+  const hiddenInput = document.getElementById("preferredDate");
+  container.innerHTML = '';
+  hiddenInput.value = '';
+  document.getElementById('capBar').style.width = '0%';
+  document.getElementById('capText').innerHTML = '';
 
   const filtered = activeMonth
     ? cachedDates.filter(d => d.date.startsWith(activeMonth))
     : cachedDates;
 
   if(filtered.length === 0){
-    select.innerHTML = '<option value="">No sessions this month — try another</option>';
+    container.style.display = 'flex';
+    container.innerHTML = '<p style="font-size:.82rem;color:var(--muted);font-weight:700;text-align:center;padding:.5rem 0;">No sessions this month — try another month</p>';
     return;
   }
 
-  const count = filtered.length;
-  select.innerHTML = `<option value="">👇 ${count} session${count > 1 ? 's' : ''} available — tap to choose</option>`;
-
+  container.style.display = 'flex';
   filtered.forEach(d => {
-    const opt = document.createElement("option");
     const slotTime = d.slot_time || "";
-    opt.value = `${d.date}||${slotTime}`;
-    opt.textContent = slotTime
-      ? `${formatDateLabel(d.date)} · ${slotTime}${d.label ? ' · ' + d.label : ''}`
-      : formatDateLabel(d.date);
-    select.appendChild(opt);
+    const val = `${d.date}||${slotTime}`;
+    const dateLabel = formatDateLabel(d.date);
+
+    const card = document.createElement('div');
+    card.className = 'session-card';
+    card.dataset.value = val;
+    card.innerHTML = `
+      <div>
+        <div class="s-date">${dateLabel}</div>
+        <div class="s-time">${slotTime}</div>
+        ${d.label ? `<div class="s-label">${d.label}</div>` : ''}
+      </div>
+      <div class="s-check">✅</div>`;
+
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.session-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      hiddenInput.value = val;
+      checkDateCapacity(val);
+    });
+    container.appendChild(card);
   });
 }
 
 // LOAD SESSIONS FROM SUPABASE FOR SELECTED VENUE
 async function loadDates(venue){
-  const select = document.getElementById("preferredDate");
-  select.innerHTML = '<option value="">— Select a session —</option>';
+  const container = document.getElementById("sessionCards");
+  container.innerHTML = '';
+  container.style.display = 'none';
+  document.getElementById("preferredDate").value = '';
   cachedDates = [];
 
   if(!venue) return;
