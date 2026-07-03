@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<!-- LUMINO CRAFT SESSION FEEDBACK FORM v1.0 -->
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#3BBFB8"/>
+<title>Session Feedback – Lumino Craft ✨</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --teal:#3BBFB8;--teal-d:#2A9E98;--teal-l:#E0F5F4;
+  --gold:#F5C842;--gold-d:#C8980A;--gold-l:#FEF6D8;
+  --coral:#F28B80;--coral-d:#D05A50;--coral-l:#FDEAE8;
+  --purple:#A888D8;--purple-d:#7850B0;--purple-l:#EEE4FA;
+  --bg:#F8FFFE;--white:#FFFFFF;
+  --ink:#1E2D2C;--muted:#5A7470;--border:#C8E8E6;
+  --r:16px;--rl:28px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:"Nunito",sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+
+/* HERO ZONE */
+.hero-zone{background:#1C2E2C;position:relative;overflow:hidden;}
+.star-field{position:absolute;inset:0;pointer-events:none;z-index:0;}
+.star{position:absolute;background:#fff;border-radius:50%;
+  animation:twinkle var(--d,3s) var(--dl,0s) ease-in-out infinite alternate;}
+@keyframes twinkle{from{opacity:var(--a,.1);}to{opacity:var(--b,.7);}}
+
+/* NAV */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(28,46,44,.94);backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(59,191,184,.2);
+  display:flex;align-items:center;justify-content:center;
+  padding:0 2rem;height:64px;
+  box-shadow:0 2px 20px rgba(0,0,0,.25);
+}
+.nav-brand{font-family:"Fredoka One",cursive;font-size:1.25rem;color:var(--gold);}
+@media(max-width:640px){nav{padding:0 1.2rem;}}
+
+/* HEADER BAND */
+.header-band{
+  background:#1C2E2C;text-align:center;
+  padding:3.5rem 1.5rem 5rem;position:relative;z-index:1;
+  clip-path: polygon(0 0, 100% 0, 100% 80%, 85% 95%, 70% 82%, 55% 98%, 40% 83%, 25% 96%, 10% 82%, 0 90%);
+}
+.header-eyebrow{font-size:.75rem;font-weight:800;letter-spacing:2px;
+  text-transform:uppercase;color:var(--teal);margin-bottom:.6rem;}
+.header-title{font-family:"Fredoka One",cursive;font-size:clamp(1.9rem,5vw,3rem);
+  color:#fff;margin-bottom:.5rem;}
+.header-title .hl{color:var(--gold);}
+.header-sub{font-size:.92rem;font-weight:700;color:rgba(255,255,255,.6);
+  max-width:520px;margin:0 auto;line-height:1.7;}
+
+/* WAVE */
+.wave-out{background:#1C2E2C;line-height:0;display:block;overflow:hidden;}
+.wave-out svg{display:block;width:100%;}
+
+/* ANON BANNER */
+.anon-banner{
+  max-width:640px;margin:2rem auto 0;
+  background:var(--white);border:2px solid var(--border);
+  border-radius:var(--rl);padding:1rem 1.5rem;
+  display:flex;align-items:center;gap:1rem;
+  box-shadow:0 4px 18px rgba(59,191,184,.08);
+}
+.anon-icon{font-size:1.8rem;flex-shrink:0;}
+.anon-text{font-size:.85rem;font-weight:700;color:var(--ink);line-height:1.5;}
+.anon-text span{color:var(--teal-d);}
+
+/* FORM CARD */
+.form-wrap{max-width:640px;margin:2rem auto 4rem;padding:0 1.2rem;}
+.form-card{
+  background:var(--white);border-radius:var(--rl);
+  border:2px solid var(--border);
+  box-shadow:0 6px 32px rgba(59,191,184,.1);
+  overflow:hidden;
+}
+.form-section{padding:2rem 2rem 0;}
+.form-section:last-of-type{padding-bottom:2rem;}
+.section-divider{height:1px;background:var(--border);margin:1.8rem 0 0;}
+
+.section-label{
+  display:inline-flex;align-items:center;gap:.5rem;
+  font-family:"Fredoka One",cursive;font-size:1.1rem;color:var(--ink);
+  margin-bottom:.5rem;
+}
+.section-label .dot{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;color:#fff;flex-shrink:0;
+}
+.dot-teal{background:var(--teal);}
+.dot-gold{background:var(--gold-d);}
+.dot-coral{background:var(--coral-d);}
+
+.q-caption{font-size:.8rem;font-weight:700;color:var(--muted);margin-bottom:1.1rem;}
+
+/* SCALE ROW (reuses radio-opt visual language) */
+.scale-row{display:flex;gap:.5rem;margin-bottom:.4rem;}
+.scale-opt{
+  flex:1;text-align:center;
+  border:2px solid var(--border);border-radius:var(--r);
+  padding:.65rem 0;cursor:pointer;
+  font-weight:800;font-size:.95rem;color:var(--muted);
+  transition:all .15s;background:var(--bg);
+  -webkit-tap-highlight-color:transparent;user-select:none;
+}
+.scale-opt:active{transform:scale(.95);}
+.scale-opt.selected{border-color:var(--teal);background:var(--teal-l);color:var(--teal-d);transform:scale(1.05);}
+.scale-labels{display:flex;justify-content:space-between;font-size:.72rem;font-weight:700;color:var(--muted);margin-bottom:1.5rem;padding:0 .1rem;}
+
+/* FORM ROWS */
+.form-row{display:flex;flex-direction:column;gap:.32rem;margin-bottom:.95rem;}
+.form-row label{font-size:.85rem;font-weight:800;color:var(--ink);}
+.form-row textarea{
+  border:2px solid var(--border);border-radius:var(--r);padding:.75rem 1rem;
+  font-family:"Nunito",sans-serif;font-size:.9rem;
+  transition:border-color .15s,box-shadow .15s;
+  width:100%;outline:none;background:#F6FEFE;color:var(--ink);
+  resize:vertical;min-height:75px;
+}
+.form-row textarea:focus{
+  border-color:var(--teal);background:var(--white);
+  box-shadow:0 0 0 3px rgba(59,191,184,.15);}
+.form-row .char-hint{font-size:.72rem;font-weight:700;color:var(--muted);}
+
+/* RECOMMEND PILLS (reuses radio-opt) */
+.radio-group{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.75rem;}
+.radio-opt{
+  flex:1;min-width:100px;text-align:center;
+  border:2px solid var(--border);border-radius:var(--r);
+  padding:.7rem 1rem;cursor:pointer;
+  font-size:.88rem;font-weight:700;color:var(--muted);
+  transition:all .15s;background:var(--bg);
+  -webkit-tap-highlight-color:transparent;user-select:none;
+}
+.radio-opt.selected{border-color:var(--teal);background:var(--teal-l);color:var(--teal-d);}
+
+/* SUBMIT AREA */
+.submit-area{
+  background:linear-gradient(135deg,#1C2E2C,#2A4240);
+  padding:2rem;text-align:center;
+  border-radius:0 0 var(--rl) var(--rl);
+  margin-top:1rem;
+}
+.submit-note{font-size:.8rem;color:rgba(255,255,255,.5);margin-bottom:1.2rem;line-height:1.6;}
+.btn-submit{
+  font-family:"Fredoka One",cursive;font-size:1.1rem;letter-spacing:.3px;
+  padding:.85rem 2.5rem;border-radius:50px;border:none;cursor:pointer;
+  background:var(--teal);color:#fff;
+  box-shadow:0 5px 18px rgba(59,191,184,.4);
+  transition:transform .15s,box-shadow .15s;width:100%;max-width:320px;
+}
+.btn-submit:hover{transform:translateY(-3px);box-shadow:0 9px 26px rgba(59,191,184,.55);}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+/* STATES */
+#successState{display:none;text-align:center;padding:3rem 2rem;}
+#successState .check{font-size:3.5rem;display:block;margin-bottom:.8rem;}
+#successState h3{font-family:"Fredoka One",cursive;font-size:1.8rem;color:var(--teal-d);margin-bottom:.5rem;}
+#successState p{font-size:.9rem;color:var(--muted);line-height:1.65;}
+#errorState{
+  display:none;
+  background:var(--coral-l);border:2px solid var(--coral);
+  border-radius:var(--r);padding:1rem 1.2rem;margin:1rem 2rem;
+  font-size:.85rem;font-weight:700;color:var(--coral-d);
+}
+
+/* FOOTER */
+footer{background:#1C2E2C;color:rgba(255,255,255,.5);
+  text-align:center;padding:2.5rem 1.5rem;position:relative;overflow:hidden;}
+.footer-brand{font-family:"Fredoka One",cursive;font-size:1.3rem;color:var(--gold);margin-bottom:.2rem;position:relative;z-index:1;}
+.footer-sub{font-size:.78rem;line-height:1.8;opacity:.5;position:relative;z-index:1;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="hero-zone">
+  <div class="star-field" id="navStars"></div>
+  <nav style="position:relative;z-index:1;">
+    <span class="nav-brand">Lumino Craft</span>
+  </nav>
+
+  <!-- HEADER -->
+  <div class="header-band">
+    <p class="header-eyebrow">✦ Anonymous Feedback</p>
+    <h1 class="header-title">How was today's <span class="hl">session</span>? 🌈</h1>
+    <p class="header-sub">Two minutes, totally anonymous — this genuinely shapes the next session.</p>
+  </div>
+</div>
+
+<!-- WAVE -->
+<div class="wave-out">
+  <svg viewBox="0 0 1440 60" preserveAspectRatio="none" style="height:36px;">
+    <path d="M0,32 C240,60 480,0 720,20 C960,40 1200,60 1440,28 L1440,60 L0,60 Z" fill="#F8FFFE"/>
+  </svg>
+</div>
+
+<!-- ANON BANNER -->
+<div class="form-wrap" style="margin-top:0;margin-bottom:0;">
+  <div class="anon-banner">
+    <span class="anon-icon">🔒</span>
+    <div class="anon-text">100% anonymous <span>— we don't collect your name, email, or child's name.</span></div>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="form-wrap">
+  <div class="form-card">
+    <div id="formState">
+
+      <!-- SECTION 1: PACING -->
+      <div class="form-section">
+        <div class="section-label"><span class="dot dot-teal">1</span> Pacing &amp; Timing</div>
+
+        <div class="form-row" style="margin-bottom:1.6rem;">
+          <label>How did the pacing of today's session feel?</label>
+          <div class="q-caption">1 = too rushed, 5 = just right</div>
+          <div class="scale-row" data-group="pacing">
+            <div class="scale-opt" data-value="1">1</div>
+            <div class="scale-opt" data-value="2">2</div>
+            <div class="scale-opt" data-value="3">3</div>
+            <div class="scale-opt" data-value="4">4</div>
+            <div class="scale-opt" data-value="5">5</div>
+          </div>
+          <div class="scale-labels"><span>Too rushed</span><span>Just right</span></div>
+        </div>
+
+        <div class="form-row">
+          <label>Did your child have enough time to explore at each station?</label>
+          <div class="q-caption">1 = not enough time, 5 = plenty of time</div>
+          <div class="scale-row" data-group="time">
+            <div class="scale-opt" data-value="1">1</div>
+            <div class="scale-opt" data-value="2">2</div>
+            <div class="scale-opt" data-value="3">3</div>
+            <div class="scale-opt" data-value="4">4</div>
+            <div class="scale-opt" data-value="5">5</div>
+          </div>
+          <div class="scale-labels"><span>Not enough</span><span>Plenty</span></div>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- SECTION 2: YOUR THOUGHTS -->
+      <div class="form-section">
+        <div class="section-label"><span class="dot dot-gold">2</span> Your Thoughts</div>
+        <div class="form-row">
+          <label>What's one thing we could improve?</label>
+          <span class="char-hint">Optional — be as specific as you'd like</span>
+          <textarea id="improveText" placeholder="e.g. the water bins felt a little small..."></textarea>
+        </div>
+        <div class="form-row">
+          <label>What did you and your child enjoy most?</label>
+          <span class="char-hint">Optional</span>
+          <textarea id="loveText" placeholder="e.g. the mindfulness part was so calming..."></textarea>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- SECTION 3: RECOMMEND -->
+      <div class="form-section" style="padding-bottom:0;">
+        <div class="section-label"><span class="dot dot-coral">3</span> One Last Thing</div>
+        <div class="form-row" style="margin-bottom:0;">
+          <label>Would you recommend Lumino Craft to another family?</label>
+          <div class="radio-group" id="recommendGroup">
+            <div class="radio-opt" data-value="yes">✅ Yes</div>
+            <div class="radio-opt" data-value="maybe">🤔 Maybe</div>
+            <div class="radio-opt" data-value="no">🚫 No</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ERROR STATE -->
+      <div id="errorState"></div>
+
+      <!-- SUBMIT -->
+      <div class="submit-area">
+        <p class="submit-note">Your response is not linked to your name, email, or registration in any way.</p>
+        <button class="btn-submit" id="submitBtn" onclick="handleSubmit()">🎉 Send Feedback</button>
+      </div>
+
+    </div><!-- /formState -->
+
+    <!-- SUCCESS STATE -->
+    <div id="successState">
+      <span class="check">🎊</span>
+      <h3>Thank you!</h3>
+      <p>Your feedback genuinely shapes how we run the next session. We appreciate you taking the time. ✨</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="star-field" id="footerStars"></div>
+  <div class="footer-brand">Lumino Craft</div>
+  <p class="footer-sub">Mindful, messy, and made for little ones ✨</p>
+</footer>
+
+<script>
+// ---- CONFIG ----
+const SUPABASE_URL = "https://gsfygkiejcdofszntocy.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZnlna2llamNkb2Zzem50b2N5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODA1OTgsImV4cCI6MjA5NjA1NjU5OH0.on9dfOVOUdE56vNA5X4eOURQQgcvtDljS5QthnfZpNE";
+// Pass location + date via URL params on the QR code, e.g.
+// feedback.html?location=Little%20Words%20Studio,%20Burnaby&date=2026-07-02
+const params = new URLSearchParams(window.location.search);
+const LOCATION = params.get("location") || "Unknown";
+const SESSION_DATE = params.get("date") || "";
+// ------------------
+
+// STAR FIELD (matches booking form)
+function makeStars(id, count){
+  const c = document.getElementById(id); if(!c) return;
+  for(let i=0;i<count;i++){
+    const s = document.createElement("div"); s.className = "star";
+    const sz = Math.random()*2+.4;
+    s.style.width = sz+"px"; s.style.height = sz+"px";
+    s.style.left = Math.random()*100+"%"; s.style.top = Math.random()*100+"%";
+    s.style.setProperty("--d",(Math.random()*3+2)+"s");
+    s.style.setProperty("--dl",(Math.random()*3)+"s");
+    s.style.setProperty("--a",(Math.random()*.3).toFixed(2));
+    s.style.setProperty("--b",(Math.random()*.5+.3).toFixed(2));
+    c.appendChild(s);
+  }
+}
+makeStars("navStars", 40);
+makeStars("footerStars", 30);
+
+// SELECTION STATE
+let selectedPacing = null;
+let selectedTime = null;
+let selectedRecommend = null;
+
+document.querySelectorAll('[data-group="pacing"] .scale-opt').forEach(el=>{
+  el.addEventListener("click", ()=>{
+    document.querySelectorAll('[data-group="pacing"] .scale-opt').forEach(o=>o.classList.remove("selected"));
+    el.classList.add("selected");
+    selectedPacing = parseInt(el.dataset.value,10);
+  });
+});
+
+document.querySelectorAll('[data-group="time"] .scale-opt').forEach(el=>{
+  el.addEventListener("click", ()=>{
+    document.querySelectorAll('[data-group="time"] .scale-opt').forEach(o=>o.classList.remove("selected"));
+    el.classList.add("selected");
+    selectedTime = parseInt(el.dataset.value,10);
+  });
+});
+
+document.querySelectorAll('#recommendGroup .radio-opt').forEach(el=>{
+  el.addEventListener("click", ()=>{
+    document.querySelectorAll('#recommendGroup .radio-opt').forEach(o=>o.classList.remove("selected"));
+    el.classList.add("selected");
+    selectedRecommend = el.dataset.value;
+  });
+});
+
+// SUBMIT
+async function handleSubmit(){
+  const btn = document.getElementById("submitBtn");
+  const errorEl = document.getElementById("errorState");
+  errorEl.style.display = "none";
+
+  const payload = {
+    location: LOCATION,
+    session_date: SESSION_DATE,
+    rating_pacing: selectedPacing,
+    rating_time_to_explore: selectedTime,
+    improve_text: document.getElementById("improveText").value.trim() || null,
+    love_text: document.getElementById("loveText").value.trim() || null,
+    would_recommend: selectedRecommend
+  };
+
+  btn.disabled = true;
+  btn.textContent = "Sending...";
+
+  try{
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/session_feedback`, {
+      method: "POST",
+      headers:{
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if(!res.ok){
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    document.getElementById("formState").style.display = "none";
+    document.getElementById("successState").style.display = "block";
+    window.scrollTo({top:0,behavior:"smooth"});
+
+  } catch(e){
+    errorEl.textContent = "⚠️ Something went wrong. Please try again.";
+    errorEl.style.display = "block";
+    btn.textContent = "🎉 Send Feedback";
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
