@@ -83,11 +83,14 @@ nav{
   border-radius:30px!important;padding:.42rem 1.15rem!important;
   box-shadow:0 4px 14px rgba(59,191,184,.4)!important;}
 .nav-cta:hover{opacity:.88!important;transform:translateY(-1px)!important;}
-.nav-check{position:absolute;opacity:0;pointer-events:none;}
-.nav-toggle{display:none;background:none;border:none;color:#fff;font-size:1.7rem;
-  cursor:pointer;padding:.1rem .3rem;line-height:1;user-select:none;}
+.nav-check{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;}
+.nav-toggle{display:none;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.25);
+  color:#fff;font-size:1.5rem;line-height:1;
+  cursor:pointer;-webkit-tap-highlight-color:rgba(255,255,255,.25);
+  width:44px;height:44px;align-items:center;justify-content:center;
+  border-radius:10px;position:relative;z-index:10;}
 @media(max-width:640px){
-  .nav-toggle{display:block;}
+  .nav-toggle{display:flex;}
   .nav-links{
     display:flex;flex-direction:column;align-items:stretch;gap:0;
     position:fixed;top:64px;left:0;right:0;
@@ -97,6 +100,7 @@ nav{
     max-height:0;overflow:hidden;transition:max-height .3s ease;
   }
   .nav-check:checked ~ .nav-links{max-height:420px;}
+  .nav-links.open{max-height:420px;}
   .nav-links li{width:100%;}
   .nav-links a{display:block;padding:.9rem 1.5rem;border-radius:0;text-align:left;}
   .nav-cta{display:inline-block;margin:.7rem 1.5rem!important;text-align:center;}
@@ -593,8 +597,16 @@ footer .star-field{opacity:.6;}
 <script>
 const navCheckEl = document.getElementById('navCheck');
 const navLinksEl = document.getElementById('navLinks');
+const navToggleEl = document.getElementById('navToggle');
 if(navCheckEl && navLinksEl){
-  navLinksEl.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=> navCheckEl.checked = false));
+  navLinksEl.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=> { navCheckEl.checked = false; navLinksEl.classList.remove('open'); }));
+}
+if(navToggleEl && navLinksEl){
+  navToggleEl.addEventListener('click', (e)=>{
+    e.preventDefault();
+    navLinksEl.classList.toggle('open');
+    if(navCheckEl) navCheckEl.checked = navLinksEl.classList.contains('open');
+  });
 }
 </script>
 <script>
