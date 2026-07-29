@@ -83,8 +83,9 @@ nav{
   border-radius:30px!important;padding:.42rem 1.15rem!important;
   box-shadow:0 4px 14px rgba(59,191,184,.4)!important;}
 .nav-cta:hover{opacity:.88!important;transform:translateY(-1px)!important;}
+.nav-check{position:absolute;opacity:0;pointer-events:none;}
 .nav-toggle{display:none;background:none;border:none;color:#fff;font-size:1.7rem;
-  cursor:pointer;padding:.1rem .3rem;line-height:1;}
+  cursor:pointer;padding:.1rem .3rem;line-height:1;user-select:none;}
 @media(max-width:640px){
   .nav-toggle{display:block;}
   .nav-links{
@@ -95,7 +96,7 @@ nav{
     border-bottom:1px solid rgba(59,191,184,.2);
     max-height:0;overflow:hidden;transition:max-height .3s ease;
   }
-  .nav-links.open{max-height:420px;}
+  .nav-check:checked ~ .nav-links{max-height:420px;}
   .nav-links li{width:100%;}
   .nav-links a{display:block;padding:.9rem 1.5rem;border-radius:0;text-align:left;}
   .nav-cta{display:inline-block;margin:.7rem 1.5rem!important;text-align:center;}
@@ -404,6 +405,7 @@ footer .star-field{opacity:.6;}
 <div class="hero-zone">
   <div class="star-field" id="navStars"></div>
   <nav style="position:relative;z-index:1;">
+    <input type="checkbox" id="navCheck" class="nav-check"/>
     <a class="nav-logo" href="#">
       <img id="navLogo" src="" alt="Lumino Craft"/>
       <span class="nav-brand">Lumino Craft</span>
@@ -416,7 +418,7 @@ footer .star-field{opacity:.6;}
       <li><a href="#contact">Contact</a></li>
       <li><a href="#booking" class="nav-cta">Get in Touch ✨</a></li>
     </ul>
-    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+    <label for="navCheck" class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</label>
   </nav>
 </div>
 
@@ -589,11 +591,10 @@ footer .star-field{opacity:.6;}
 </div>
 
 <script>
-const navToggle = document.getElementById('navToggle');
+const navCheckEl = document.getElementById('navCheck');
 const navLinksEl = document.getElementById('navLinks');
-if(navToggle && navLinksEl){
-  navToggle.addEventListener('click', ()=> navLinksEl.classList.toggle('open'));
-  navLinksEl.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=> navLinksEl.classList.remove('open')));
+if(navCheckEl && navLinksEl){
+  navLinksEl.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=> navCheckEl.checked = false));
 }
 </script>
 <script>
