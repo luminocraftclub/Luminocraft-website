@@ -74,6 +74,8 @@ nav{
   border-radius:30px!important;padding:.42rem 1.15rem!important;
   box-shadow:0 4px 14px rgba(59,191,184,.4)!important;}
 .nav-cta:hover{opacity:.88!important;transform:translateY(-1px)!important;}
+.nav-toggle{display:none;background:none;border:none;color:#fff;font-size:1.7rem;
+  cursor:pointer;padding:.1rem .3rem;line-height:1;order:1;}
 .nav-cart-btn{position:relative;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.2);
   color:#fff;border-radius:30px;padding:.4rem .9rem;font-family:'Fredoka One',cursive;
   font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:.4rem;transition:all .15s;}
@@ -81,7 +83,19 @@ nav{
 .cart-badge{position:absolute;top:-6px;right:-6px;background:var(--coral);color:#fff;
   font-size:.68rem;font-weight:800;width:19px;height:19px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;}
-@media(max-width:640px){.nav-links{display:none;}}
+@media(max-width:640px){
+  .nav-toggle{display:block;}
+  .nav-links{
+    display:flex;flex-direction:column;align-items:stretch;gap:0;
+    position:absolute;top:64px;left:0;right:0;
+    background:rgba(20,33,32,.98);backdrop-filter:blur(16px);
+    border-bottom:1px solid rgba(59,191,184,.2);
+    max-height:0;overflow:hidden;transition:max-height .3s ease;
+  }
+  .nav-links.open{max-height:420px;}
+  .nav-links li{width:100%;}
+  .nav-links a{display:block;padding:.9rem 1.5rem;border-radius:0;text-align:left;}
+}
 
 /* ══ PAGE HEADER ══ */
 #shopHero{
@@ -241,7 +255,7 @@ footer .star-field{opacity:.6;}
       <img id="navLogo" src="" alt="Lumino Craft"/>
       <span class="nav-brand">Lumino Craft</span>
     </a>
-    <ul class="nav-links">
+    <ul class="nav-links" id="navLinks">
       <li><a href="index.html#services">What We Offer</a></li>
       <li><a href="index.html#ages">Ages</a></li>
       <li><a href="index.html#events">Events</a></li>
@@ -252,6 +266,7 @@ footer .star-field{opacity:.6;}
       🛍️ Cart
       <span class="cart-badge" id="cartBadge" style="display:none;">0</span>
     </button>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
   </nav>
 </div>
 
@@ -325,6 +340,14 @@ footer .star-field{opacity:.6;}
   </div>
 </div>
 
+<script>
+const navToggle = document.getElementById('navToggle');
+const navLinksEl = document.getElementById('navLinks');
+if(navToggle && navLinksEl){
+  navToggle.addEventListener('click', ()=> navLinksEl.classList.toggle('open'));
+  navLinksEl.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=> navLinksEl.classList.remove('open')));
+}
+</script>
 <script>
 /* PRODUCTS */
 const PRODUCTS = [
