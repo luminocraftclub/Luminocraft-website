@@ -534,11 +534,16 @@ async function placeOrder(){
   btn.textContent = "Preparing checkout…";
 
   const items = Object.entries(cart).map(([id,qty])=>({id, qty}));
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZnlna2llamNkb2Zzem50b2N5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODA1OTgsImV4cCI6MjA5NjA1NjU5OH0.on9dfOVOUdE56vNA5X4eOURQQgcvtDljS5QthnfZpNE";
 
   try{
     const res = await fetch("https://gsfygkiejcdofszntocy.supabase.co/functions/v1/create-checkout", {
       method: "POST",
-      headers: {"Content-Type":"application/json"},
+      headers: {
+        "Content-Type":"application/json",
+        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+        "apikey": SUPABASE_ANON_KEY
+      },
       body: JSON.stringify({ items, fulfillment, venue, siteUrl: window.location.origin })
     });
     const data = await res.json();
