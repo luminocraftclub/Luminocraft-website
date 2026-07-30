@@ -90,23 +90,28 @@ nav{
   width:44px;height:44px;align-items:center;justify-content:center;
   border-radius:10px;position:relative;z-index:10000;
   touch-action:manipulation;-webkit-touch-callout:none;}
+.mobile-nav-links{display:none;}
 @media(max-width:640px){
   .nav-toggle{display:flex;}
-  .nav-links{
+  .nav-links{display:none;}
+  .mobile-nav-links{
     display:flex;flex-direction:column;align-items:stretch;gap:0;
     justify-content:center;
     position:fixed;inset:0;
     z-index:9999;
     background:rgba(15,25,24,.98);backdrop-filter:blur(16px);
     opacity:0;visibility:hidden;transition:opacity .25s ease;
+    list-style:none;
   }
-  .nav-check:checked ~ .nav-links,
-  .nav-links.open{
+  .nav-check:checked ~ .mobile-nav-links,
+  .mobile-nav-links.open{
     opacity:1;visibility:visible;
   }
-  .nav-links li{width:100%;text-align:center;margin:.4rem 0;}
-  .nav-links a{display:block;padding:1.1rem 1.5rem;border-radius:0;font-size:1.1rem;}
-  .nav-cta{display:inline-block;margin:1rem auto!important;text-align:center;max-width:220px;}
+  .mobile-nav-links li{width:100%;text-align:center;margin:.4rem 0;}
+  .mobile-nav-links a{display:block;padding:1.1rem 1.5rem;border-radius:0;font-size:1.1rem;
+    color:rgba(255,255,255,.85);text-decoration:none;font-weight:700;}
+  .mobile-nav-links .nav-cta{display:inline-block;margin:1rem auto!important;text-align:center;max-width:220px;
+    background:var(--teal);color:#fff!important;font-weight:800;border-radius:30px;padding:.7rem 1.4rem;}
 }
 
 /* ══ HERO ══ */
@@ -409,7 +414,7 @@ footer .star-field{opacity:.6;}
 <body>
 
 <input type="checkbox" id="navCheck" class="nav-check"/>
-<ul class="nav-links" id="navLinks">
+<ul class="mobile-nav-links" id="mobileNavLinks">
   <li><a href="#services">What We Offer</a></li>
   <li><a href="#ages">Ages</a></li>
   <li><a href="#events">Events</a></li>
@@ -426,6 +431,14 @@ footer .star-field{opacity:.6;}
       <img id="navLogo" src="" alt="Lumino Craft"/>
       <span class="nav-brand">Lumino Craft</span>
     </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#services">What We Offer</a></li>
+      <li><a href="#ages">Ages</a></li>
+      <li><a href="#events">Events</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li><a href="#booking" class="nav-cta">Get in Touch ✨</a></li>
+    </ul>
     <label for="navCheck" class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</label>
   </nav>
 </div>
@@ -600,16 +613,16 @@ footer .star-field{opacity:.6;}
 
 <script>
 const navCheckEl = document.getElementById('navCheck');
-const navLinksEl = document.getElementById('navLinks');
+const mobileNavLinksEl = document.getElementById('mobileNavLinks');
 const navToggleEl = document.getElementById('navToggle');
-if(navCheckEl && navLinksEl){
-  navLinksEl.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=> { navCheckEl.checked = false; navLinksEl.classList.remove('open'); }));
+if(navCheckEl && mobileNavLinksEl){
+  mobileNavLinksEl.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=> { navCheckEl.checked = false; mobileNavLinksEl.classList.remove('open'); }));
 }
-if(navToggleEl && navLinksEl){
+if(navToggleEl && mobileNavLinksEl){
   navToggleEl.addEventListener('click', (e)=>{
     e.preventDefault();
-    navLinksEl.classList.toggle('open');
-    if(navCheckEl) navCheckEl.checked = navLinksEl.classList.contains('open');
+    mobileNavLinksEl.classList.toggle('open');
+    if(navCheckEl) navCheckEl.checked = mobileNavLinksEl.classList.contains('open');
   });
 }
 </script>
