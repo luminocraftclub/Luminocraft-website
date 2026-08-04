@@ -377,9 +377,31 @@ const PRODUCTS = [
 const SHIP_COST = 8.00;
 let cart = {};        // { productId: qty }
 let fulfillment = "pickup";
+const SUPABASE_URL_STOCK = "https://gsfygkiejcdofszntocy.supabase.co";
+const SUPABASE_KEY_STOCK = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZnlna2llamNkb2Zzem50b2N5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODA1OTgsImV4cCI6MjA5NjA1NjU5OH0.on9dfOVOUdE56vNA5X4eOURQQgcvtDljS5QthnfZpNE";
+
+/* PULL LIVE STOCK FROM SUPABASE, THEN RENDER */
+async function loadStockAndRender(){
+  try{
+    const res = await fetch(`${SUPABASE_URL_STOCK}/rest/v1/products?select=id,stock`, {
+      headers: { "apikey": SUPABASE_KEY_STOCK, "Authorization": `Bearer ${SUPABASE_KEY_STOCK}` }
+    });
+    const rows = await res.json();
+    if(Array.isArray(rows)){
+      rows.forEach(row=>{
+        const p = PRODUCTS.find(x=>x.id===row.id);
+        if(p) p.stock = row.stock;
+      });
+    }
+  } catch(e){
+    console.warn("Could not load live stock, using fallback values:", e);
+  }
+  renderProducts();
+}
 
 /* RENDER PRODUCT GRID */
 const grid = document.getElementById("shopGrid");
+function renderProducts(){
 PRODUCTS.forEach(p=>{
   const stockLabel = p.stock===0 ? '<span class="stock-pill out">Sold Out</span>'
     : p.stock<=2 ? `<span class="stock-pill low">Only ${p.stock} left</span>`
@@ -408,6 +430,8 @@ PRODUCTS.forEach(p=>{
       </div>
     </div>`;
 });
+}
+loadStockAndRender();
 
 /* SELECTED QTY (pre-cart, per product) */
 const selectedQty = {};
