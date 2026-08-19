@@ -365,8 +365,6 @@ footer{background:#1C2E2C;color:rgba(255,255,255,.5);
             <option value="This World's Our Center">This World's Our Center</option>
             <option value="Solace Wellness Collective, Pitt Meadows">Solace Wellness Collective, Pitt Meadows</option>
             <option value="Project Play, Langley">Project Play, Langley</option>
-            <option value="Playscape Cafe, Vancouver">Playscape Cafe, Vancouver</option>
-            <option value="Jolly & Joy, North Vancouver">Jolly & Joy, North Vancouver</option>
           </select>
         </div>
         <div class="form-row">
@@ -627,7 +625,9 @@ async function loadDates(venue){
     );
     if(!res.ok){ throw new Error("HTTP " + res.status); }
     const dates = await res.json();
-    cachedDates = Array.isArray(dates) ? dates : [];
+    // September 2026 sessions are booked through the new September Pass page instead —
+    // exclude them here so no one books at the old flat rate.
+    cachedDates = Array.isArray(dates) ? dates.filter(d => !d.date.startsWith('2026-09')) : [];
     activeMonth = null;
   } catch(e){
     cachedDates = [];
