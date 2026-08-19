@@ -295,7 +295,8 @@ section{padding:5rem 1.5rem;position:relative;}
 .etab:hover{border-color:var(--teal);color:var(--teal-d);}
 .etab.active{color:#fff;}
 .etab-0.active{background:var(--teal);border-color:var(--teal-d);box-shadow:0 4px 14px rgba(59,191,184,.38);}
-.etab-1.active{background:var(--coral);border-color:var(--coral-d);box-shadow:0 4px 14px rgba(242,139,128,.38);}
+.etab-1.active{background:var(--gold);border-color:var(--gold-d);box-shadow:0 4px 14px rgba(245,200,66,.38);}
+.etab-2.active{background:var(--coral);border-color:var(--coral-d);box-shadow:0 4px 14px rgba(242,139,128,.38);}
 .events-panel{display:none;max-width:860px;margin:0 auto;position:relative;z-index:1;}
 .events-panel.active{display:block;}
 .event-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:1.2rem;}
@@ -463,6 +464,7 @@ footer .star-field{opacity:.6;}
     <div class="hero-btns">
       <a href="#booking" class="btn btn-teal">🎂 Book Your Birthday Party</a>
       <a href="sensory-party-register.html" class="btn btn-teal">🌈 Register for Sensory Party</a>
+      <a href="pass-register.html" class="btn btn-teal">✨ Register for September Sessions</a>
     </div>
   </section>
 </div>
@@ -540,11 +542,13 @@ footer .star-field{opacity:.6;}
 
   </div>
   <div class="events-tabs reveal">
-    <button class="etab etab-0 active" onclick="switchTab(0)">🎨 Weekend Parties</button>
-    <button class="etab etab-1" onclick="switchTab(1)">🎂 Birthday Parties</button>
+    <button class="etab etab-0 active" onclick="switchTab(0)">🌈 Sensory Craft Parties</button>
+    <button class="etab etab-1" onclick="switchTab(1)">🧱 Lumino Play Lab</button>
+    <button class="etab etab-2" onclick="switchTab(2)">🎂 Birthday Parties</button>
   </div>
   <div class="events-panel active" id="panel-0"></div>
   <div class="events-panel" id="panel-1"></div>
+  <div class="events-panel" id="panel-2"></div>
 </section>
 
 <div style="background:#EAF6F5;line-height:0;display:block;overflow:hidden;">
@@ -633,12 +637,15 @@ const CONFIG = {
   instagram:"@LuminoCraftClub",instagramLink:"https://instagram.com/LuminoCraftClub",
   location:"Lower Mainland, BC, Canada",
   subTagline:"Mindful art  |  Messy Play  |  Birthday Parties",
-  subTagline2:"Ages 0 – 4 years",
+  subTagline2:"Ages 0 – 5 years",
   services:[
     {icon:"🌈",title:"Sensory Craft Party",
       description:"A multi-sensory experience for babies and toddlers — tactile textures, calming colours and process-led play that nurtures emotional development.",
       link:"craft-party-baby-sensory-proposal.html",
       register:"sensory-party-register.html"},
+    {icon:"🧱",title:"Lumino Play Lab",
+      description:"A 3-week series for ages 3–5 where parents play alongside their child — pre-math, pre-literacy and social-emotional skills woven invisibly into hands-on play.",
+      link:"lumino-play-lab.html"},
     {icon:"🎉",title:"Birthday Parties",
       description:"Make your child's special day meaningful and memorable. Customised craft party themes, all materials included — calm, creative and full of joy.",
       link:"birthday-parties.html"}
@@ -647,28 +654,41 @@ const CONFIG = {
     {emoji:"👶",range:"Ages 0–2",groupName:"Tiny Explorers",
       description:"Gentle sensory experiences for your littlest ones. Caregiver-accompanied, completely safe, and designed to delight curious babies and toddlers.",
       activities:["🤲 Sensory Play","🖌️ Finger Painting","🌿 Nature Touch","🎶 Craft & Rhyme","🫧 Bubble Play","🍃 Texture Art","✨ And More"]},
-    {emoji:"🧸",range:"Ages 2–4",groupName:"Mini Makers",
+    {emoji:"🧸",range:"Ages 3–5",groupName:"Mini Makers",
       description:"Gentle, sensory-first experiences for little ones just discovering the joy of making. Parent/caregiver accompanied, safe, and wonderfully messy!",
       activities:["🖌️ Finger Painting","🌿 Nature Collage","🧴 Sensory Play","🎶 Craft & Rhyme","🫧 Bubble Art","🤲 Playdough Fun","✨ And More"]}
   ],
   events:{
-    weekend:[
-      {title:"Dino Adventures 🦕",date:"5th and 12th July",
-       time:"10:30–11:30 AM",
-       location:"Little Words Studio",
-       address:"3355 North Rd Unit 204, Burnaby, BC V3J 1H9"},
-      {title:"Dino Adventures 🦕",date:"19th July",
-       time:"11:00–12:00 PM",
-       location:"This World's Ours Centre",
-       address:"191 E 10th Ave, Vancouver, BC V5T 1Z2"},
-      {title:"Dino Adventures 🦕",date:"21st July",
-       time:"9:00–10:00 AM & 10:30–11:30 AM",
-       location:"Solace Wellness Collective",
-       address:"12165 Harris Rd Unit 203/205, Pitt Meadows, BC V3Y 2E9"},
-      {title:"Dino Adventures 🦕",date:"29th July",
-       time:"10:30–11:30 AM",
-       location:"Project Play Activity Center",
-       address:"19748 86 Ave a110, Langley Twp, BC V2Y 1Z7"}
+    sensoryParty:[
+      {title:"Sensory Craft Party 🤲",date:"3rd September",
+       location:"Playscape Cafe, Vancouver",
+       note:"New location! ✨"},
+      {title:"Sensory Craft Party 🤲",date:"8th September",
+       location:"Solace Wellness Collective, Pitt Meadows"},
+      {title:"Sensory Craft Party 🤲",date:"15th September",
+       location:"Project Play, Langley"},
+      {title:"Sensory Craft Party 🤲",date:"17th September",
+       location:"This World's Our Center, Vancouver"},
+      {title:"Sensory Craft Party 🤲",date:"22nd September",
+       location:"Solace Wellness Collective, Pitt Meadows"},
+      {title:"Sensory Craft Party 🤲",date:"23rd September",
+       location:"Jolly & Joy, North Vancouver",
+       note:"New location! ✨"},
+      {title:"Sensory Craft Party 🤲",date:"24th September",
+       location:"This World's Our Center, Vancouver"},
+      {title:"Sensory Craft Party 🤲",date:"29th September",
+       location:"Project Play, Langley"}
+    ],
+    playLab:[
+      {title:"Lumino Play Lab 🧱",date:"16th September",
+       location:"Solace Wellness Collective, Pitt Meadows",
+       note:"New program! ✨"},
+      {title:"Lumino Play Lab 🧱",date:"19th September",
+       location:"Jolly & Joy, North Vancouver",
+       note:"New location & new program! ✨"},
+      {title:"Lumino Play Lab 🧱",date:"27th September",
+       location:"Solace Wellness Collective, Pitt Meadows",
+       note:"New program! ✨"}
     ],
     parties:[]
   }
@@ -732,7 +752,7 @@ CONFIG.ageGroups.forEach((g,i)=>{
 });
 
 /* EVENTS */
-[{key:"weekend",label:"weekend"},{key:"parties",label:"birthday"}].forEach((meta,idx)=>{
+[{key:"sensoryParty",label:"Sensory Craft Party"},{key:"playLab",label:"Lumino Play Lab"},{key:"parties",label:"birthday"}].forEach((meta,idx)=>{
   const panel=document.getElementById(`panel-${idx}`);
   const evs=(CONFIG.events[meta.key]||[]).filter(e=>e.active!==false);
   if(!evs.length){
