@@ -464,7 +464,7 @@ async function handleSubmit(){
   };
 
   try{
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/create-pass-payment`, {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/pass-payment`, {
       method: "POST",
       headers:{
         apikey: SUPABASE_KEY,
