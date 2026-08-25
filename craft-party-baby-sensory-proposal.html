@@ -266,23 +266,26 @@ section{padding:5rem 1.5rem;position:relative;}
 /* ── PRICING ── */
 #pricing{background:var(--bg);}
 #pricing::before{content:'';position:absolute;inset:0;pointer-events:none;
-  background-image:radial-gradient(circle,var(--teal) 1.5px,transparent 1.5px);
-  background-size:32px 32px;opacity:.055;z-index:0;}
-.pricing-wrap{max-width:440px;margin:0 auto;position:relative;z-index:1;}
+  background-image:radial-gradient(circle,var(--purple) 1.5px,transparent 1.5px);
+  background-size:32px 32px;opacity:.04;z-index:0;}
+.pricing-wrap{max-width:480px;margin:0 auto;position:relative;z-index:1;}
 .price-card{background:var(--white);border-radius:var(--rl);padding:2.5rem 2rem;
-  text-align:center;border:3px solid var(--teal);
-  box-shadow:0 6px 30px rgba(59,191,184,.18);}
+  text-align:center;border:3px solid var(--purple);
+  box-shadow:0 6px 30px rgba(168,136,216,.18);}
 .price-card .p-icon{font-size:2.8rem;display:block;margin-bottom:.8rem;}
 .price-card .p-type{font-size:.72rem;font-weight:800;letter-spacing:2px;
   text-transform:uppercase;color:var(--muted);margin-bottom:.8rem;}
 .price-card .p-amount{font-family:'Fredoka One',cursive;font-size:4.5rem;
-  line-height:1;color:var(--teal-d);margin-bottom:.3rem;}
+  line-height:1;color:var(--purple-d);margin-bottom:.3rem;}
 .price-card .p-per{font-size:.85rem;font-weight:700;color:var(--muted);margin-bottom:1.6rem;}
 .price-card ul{list-style:none;text-align:left;}
 .price-card ul li{font-size:.92rem;font-weight:700;color:var(--muted);
   padding:.6rem 0;border-bottom:1px solid var(--border);
   display:flex;align-items:center;gap:.6rem;}
 .price-card ul li:last-child{border-bottom:none;}
+.price-note{font-size:.85rem;font-weight:700;color:var(--muted);
+  margin-top:1.2rem;padding:.8rem 1rem;background:var(--purple-l);
+  border-radius:var(--r);line-height:1.6;}
 
 /* ── BRING ── */
 #bring{background:var(--bg2);}
