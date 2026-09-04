@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<!-- LUMINO CRAFT — SEPTEMBER PASS REGISTRATION v1.0 -->
-<!-- Handles both Sensory Craft Party (0-2) and Lumino Play Lab intro (3-5) session passes -->
+<!-- LUMINO CRAFT — SEPTEMBER PASS REGISTRATION v1.2 (added waitlist join flow) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -90,6 +89,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--teal);}
 }
 .social-ig{background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);}
 .social-wa{background:#25D366;}
+.waitlist-confirm{background:var(--gold-l);border:2px solid var(--gold-d);border-radius:10px;padding:.5rem .7rem;font-size:.78rem;font-weight:800;margin-top:.5rem;}
 </style>
 </head>
 <body>
@@ -232,11 +232,11 @@ const TIER_PRICES = { 1: 2800, 2: 5200, 3: 7500 };
 
 let selectedProgram = null;
 let selectedTier = null;
-let photoConsentValue = null; // true/false, null = not chosen
-let venueOptionsCache = {}; // program -> [venue names]
-let sessionDatesCache = {}; // "program|venue" -> [{date, slot_time}]
-let venueCapacityCache = {}; // venue -> max_capacity
-let sessionPicks = []; // [{venue, date, slot_time}]
+let photoConsentValue = null;
+let venueOptionsCache = {};
+let sessionDatesCache = {};
+let venueCapacityCache = {};
+let sessionPicks = [];
 
 function formatDateLabel(dateStr){
   const [y,m,d] = dateStr.split('-').map(Number);
@@ -305,6 +305,8 @@ async function onVenueChange(idx){
   const venue = document.getElementById(`venue-${idx}`).value;
   sessionPicks[idx] = { venue, date:'', slot_time:'' };
   const slotSelect = document.getElementById(`slot-${idx}`);
+  document.getElementById(`capLine-${idx}`).innerHTML = '';
+  document.getElementById(`capBarWrap-${idx}`).style.display = 'none';
   if(!venue){
     slotSelect.disabled = true;
     slotSelect.innerHTML = '<option value="">— Select a venue first —</option>';
@@ -329,6 +331,8 @@ async function onVenueChange(idx){
 
 function onSlotChange(idx){
   const val = document.getElementById(`slot-${idx}`).value;
+  document.getElementById(`capLine-${idx}`).innerHTML = '';
+  document.getElementById(`capBarWrap-${idx}`).style.display = 'none';
   if(!val){ sessionPicks[idx].date=''; sessionPicks[idx].slot_time=''; return; }
   const [date, slot_time] = val.split('||');
   sessionPicks[idx].date = date;
@@ -366,8 +370,16 @@ async function checkCapacity(idx){
     capBar.style.width = pct + "%";
 
     if(remaining <= 0){
-      capLine.innerHTML = `<span style="color:#B23A3A;">Fully booked — please pick a different date</span>`;
+      capLine.innerHTML = `<span style="color:#B23A3A;">Fully booked!</span> <button type="button" onclick="joinWaitlistForSession(${idx})" id="waitlistBtn-${idx}" style="margin-left:.4rem;background:var(--gold);border:none;border-radius:8px;padding:.3rem .7rem;font-size:.75rem;font-weight:800;cursor:pointer;">📝 Join Waitlist</button>`;
       capBar.style.background = "#E88";
+      // Store what they were trying to book so the waitlist button knows, then clear
+      // the actual selection so this slot can't be included in a paid pass.
+      sessionPicks[idx]._waitlistVenue = venue;
+      sessionPicks[idx]._waitlistDate = date;
+      sessionPicks[idx]._waitlistSlot = slot_time;
+      sessionPicks[idx].date = '';
+      sessionPicks[idx].slot_time = '';
+      document.getElementById(`slot-${idx}`).value = '';
     } else if(remaining <= 3){
       capLine.innerHTML = `<span style="color:#C8980A;">${remaining} spot${remaining===1?"":"s"} left!</span>`;
       capBar.style.background = "linear-gradient(90deg,#F5C842,#C8980A)";
@@ -378,6 +390,73 @@ async function checkCapacity(idx){
   } catch(e){
     capLine.textContent = "Available";
     capBarWrap.style.display = "none";
+  }
+}
+
+async function joinWaitlistForSession(idx){
+  const pick = sessionPicks[idx];
+  const venue = pick._waitlistVenue;
+  const date = pick._waitlistDate;
+  const slot_time = pick._waitlistSlot;
+
+  const parentName = document.getElementById('parentName').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const childName = document.getElementById('childName').value.trim();
+  const childDob = document.getElementById('childDob').value;
+  const waiverChecked = document.getElementById('waiver').checked;
+
+  if(!parentName || !phone || !email || !childName || !childDob){
+    alert("Please fill in your name, phone, email, child's name and date of birth in the Your Details section below first — then come back and tap Join Waitlist.");
+    document.getElementById('infoCard').scrollIntoView({behavior:'smooth'});
+    return;
+  }
+  if(photoConsentValue === null){
+    alert("Please select a photo consent option (Yes or No) in the Your Details section below first — then come back and tap Join Waitlist.");
+    document.getElementById('infoCard').scrollIntoView({behavior:'smooth'});
+    return;
+  }
+  if(!waiverChecked){
+    alert("Please read and agree to the waiver in the Your Details section below first — then come back and tap Join Waitlist.");
+    document.getElementById('infoCard').scrollIntoView({behavior:'smooth'});
+    return;
+  }
+
+  const btn = document.getElementById(`waitlistBtn-${idx}`);
+  btn.textContent = "Adding...";
+  btn.disabled = true;
+
+  try{
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+      method: "POST",
+      headers:{
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({
+        parent_name: parentName,
+        phone_number: phone,
+        email: email,
+        child_name: childName,
+        child_dob: childDob,
+        venue: venue,
+        preferred_date: `${date} ${slot_time}`,
+        allergies_notes: document.getElementById('notes').value.trim(),
+        waiver_accepted: waiverChecked,
+        photo_consent: photoConsentValue,
+        program: selectedProgram,
+      })
+    });
+    if(!res.ok) throw new Error(await res.text());
+
+    document.getElementById(`capLine-${idx}`).innerHTML =
+      `<div class="waitlist-confirm">✅ You're on the waitlist for this session! We'll reach out the moment a spot opens.</div>`;
+  } catch(e){
+    btn.textContent = "📝 Join Waitlist";
+    btn.disabled = false;
+    alert("Something went wrong joining the waitlist. Please try again or email luminocraftclub@gmail.com");
   }
 }
 
@@ -398,18 +477,16 @@ async function handleSubmit(){
   errorEl.style.display = 'none';
   const btn = document.getElementById('submitBtn');
 
-  // Validate program/tier
   if(!selectedProgram || !selectedTier){
     errorEl.textContent = "⚠️ Please choose a program and a session pass above.";
     errorEl.style.display = 'block';
     return;
   }
 
-  // Validate all session pickers filled + no duplicates
   const seen = new Set();
   for(const pick of sessionPicks){
     if(!pick.venue || !pick.date || !pick.slot_time){
-      errorEl.textContent = "⚠️ Please select a venue and date/time for every session.";
+      errorEl.textContent = "⚠️ Please select a venue and date/time for every session (or join the waitlist for any full sessions).";
       errorEl.style.display = 'block';
       return;
     }
@@ -460,7 +537,7 @@ async function handleSubmit(){
     allergies_notes: notes,
     waiver_accepted: waiver,
     photo_consent: photoConsentValue,
-    sessions: sessionPicks,
+    sessions: sessionPicks.map(p => ({ venue: p.venue, date: p.date, slot_time: p.slot_time })),
   };
 
   try{
