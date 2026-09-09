@@ -31,7 +31,7 @@ body{font-family:"Nunito",sans-serif;background:var(--bg);color:var(--ink);-webk
 .tier-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.7rem;}
 .tier-btn{border:2px solid var(--border);border-radius:16px;padding:.9rem .5rem;text-align:center;cursor:pointer;background:var(--white);transition:.15s;}
 .tier-btn.active{border-color:var(--gold-d);background:var(--gold-l);}
-.tier-btn .n{font-family:"Fredoka One",cursive;font-size:1.4rem;color:var(--teal-d);}
+.tier-btn .n{font-family:"Fredoka One",cursive;font-size:.95rem;color:var(--teal-d);line-height:1.2;min-height:2.3em;display:flex;align-items:center;justify-content:center;}
 .tier-btn .price{font-weight:800;font-size:1rem;}
 .tier-btn .per{font-size:.72rem;color:var(--muted);}
 .session-block{border:2px dashed var(--border);border-radius:16px;padding:1rem;margin-bottom:.9rem;}
@@ -95,8 +95,8 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--teal);}
 <body>
 
 <div class="wrap">
-  <div class="header-title">September Session Passes ✨</div>
-  <div class="header-sub">Mix & match dates and locations — valid for September sessions only</div>
+  <div class="header-title" id="headerTitle">Choose Your Pass ✨</div>
+  <div class="header-sub">Mix & match dates and locations — valid for this calendar month only</div>
 
   <!-- STEP 1: PROGRAM -->
   <div class="card">
@@ -120,15 +120,16 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--teal);}
     <div class="section-label">How many sessions?</div>
     <div class="tier-grid">
       <div class="tier-btn" id="tier-1" onclick="selectTier(1)">
-        <div class="n">1</div><div class="price">$28</div><div class="per">drop-in</div>
+        <div class="n">Drop In</div><div class="price">$28</div><div class="per">1 session</div>
       </div>
       <div class="tier-btn" id="tier-2" onclick="selectTier(2)">
-        <div class="n">2</div><div class="price">$52</div><div class="per">$26/session</div>
+        <div class="n">Our Ritual</div><div class="price">$52</div><div class="per">2 sessions</div>
       </div>
       <div class="tier-btn" id="tier-3" onclick="selectTier(3)">
-        <div class="n">3</div><div class="price">$75</div><div class="per">$25/session</div>
+        <div class="n">LM Explorer</div><div class="price">$75</div><div class="per">3 sessions</div>
       </div>
     </div>
+    <div class="muted-note" id="tierExplainer" style="margin-top:.9rem;"></div>
   </div>
 
   <!-- STEP 3: SESSION PICKERS -->
@@ -244,6 +245,16 @@ function formatDateLabel(dateStr){
   return dt.toLocaleDateString('en-US',{weekday:'long', month:'long', day:'numeric', year:'numeric'});
 }
 
+// Always "today onward" — no cutoff. Add next month's session_dates rows
+// whenever convenient (even weeks ahead) and they become bookable immediately.
+function getBookableFrom(){
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  return `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+}
+
+document.getElementById('headerTitle').textContent = `Choose Your Pass ✨`;
+
 async function selectProgram(program){
   selectedProgram = program;
   document.getElementById('btn-sensory').classList.toggle('active', program==='sensory_craft_party');
@@ -257,7 +268,7 @@ async function selectProgram(program){
 
   if(!venueOptionsCache[program]){
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/session_dates?select=location_name&program=eq.${program}&date=gte.2026-09-01&date=lt.2026-10-01`,
+      `${SUPABASE_URL}/rest/v1/session_dates?select=location_name&program=eq.${program}&date=gte.${getBookableFrom()}`,
       { headers:{ apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
     );
     const rows = await res.json();
@@ -265,10 +276,17 @@ async function selectProgram(program){
   }
 }
 
+const TIER_EXPLAINERS = {
+  1: "<strong>Drop In</strong> (1 session) — at your chosen Lower Mainland location, valid for any scheduled date this month.",
+  2: "<strong>Our Ritual</strong> (2 sessions) — at the <strong>same location</strong>, within this month, at a discount vs. single sessions.",
+  3: "<strong>LM Explorer</strong> (3 sessions) — usable across <strong>any of our participating locations</strong> \u2014 mix and match for full flexibility.",
+};
+
 function selectTier(tier){
   selectedTier = tier;
   ['tier-1','tier-2','tier-3'].forEach(id=>document.getElementById(id).classList.remove('active'));
   document.getElementById(`tier-${tier}`).classList.add('active');
+  document.getElementById('tierExplainer').innerHTML = TIER_EXPLAINERS[tier];
   sessionPicks = Array.from({length: tier}, ()=>({venue:'', date:'', slot_time:''}));
   renderSessionPickers();
   document.getElementById('infoCard').classList.remove('hidden');
@@ -283,13 +301,15 @@ function renderSessionPickers(){
   sessionPicks.forEach((pick, idx)=>{
     const block = document.createElement('div');
     block.className = 'card session-block';
+    const isLockedVenue = (selectedTier === 2 && idx === 1);
     block.innerHTML = `
       <div class="label">Session ${idx+1} of ${sessionPicks.length}</div>
       <label>Venue *</label>
-      <select id="venue-${idx}" onchange="onVenueChange(${idx})">
+      <select id="venue-${idx}" onchange="onVenueChange(${idx})" ${isLockedVenue ? 'disabled' : ''}>
         <option value="">— Select a venue —</option>
         ${venues.map(v=>`<option value="${v}">${v}</option>`).join('')}
       </select>
+      ${isLockedVenue ? '<div class="muted-note">Same location as Session 1 (2-Session Pass requires one location)</div>' : ''}
       <label>Date & Time *</label>
       <select id="slot-${idx}" onchange="onSlotChange(${idx})" disabled>
         <option value="">— Select a venue first —</option>
@@ -304,6 +324,20 @@ function renderSessionPickers(){
 async function onVenueChange(idx){
   const venue = document.getElementById(`venue-${idx}`).value;
   sessionPicks[idx] = { venue, date:'', slot_time:'' };
+  await populateSlotDropdown(idx, venue);
+
+  // 2-Session Pass: session 1's venue choice locks session 2's venue too
+  if(selectedTier === 2 && idx === 0){
+    const venueSelect1 = document.getElementById('venue-1');
+    if(venueSelect1){
+      venueSelect1.value = venue;
+      sessionPicks[1] = { venue, date:'', slot_time:'' };
+      await populateSlotDropdown(1, venue);
+    }
+  }
+}
+
+async function populateSlotDropdown(idx, venue){
   const slotSelect = document.getElementById(`slot-${idx}`);
   document.getElementById(`capLine-${idx}`).innerHTML = '';
   document.getElementById(`capBarWrap-${idx}`).style.display = 'none';
@@ -317,7 +351,7 @@ async function onVenueChange(idx){
   const cacheKey = `${selectedProgram}|${venue}`;
   if(!sessionDatesCache[cacheKey]){
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/session_dates?select=date,slot_time&program=eq.${selectedProgram}&location_name=eq.${encodeURIComponent(venue)}&date=gte.2026-09-01&date=lt.2026-10-01&order=date.asc,slot_time.asc`,
+      `${SUPABASE_URL}/rest/v1/session_dates?select=date,slot_time&program=eq.${selectedProgram}&location_name=eq.${encodeURIComponent(venue)}&date=gte.${getBookableFrom()}&order=date.asc,slot_time.asc`,
       { headers:{ apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
     );
     sessionDatesCache[cacheKey] = await res.json();
@@ -497,6 +531,15 @@ async function handleSubmit(){
       return;
     }
     seen.add(key);
+  }
+
+  if(sessionPicks.length > 1){
+    const months = new Set(sessionPicks.map(p => p.date.slice(0,7)));
+    if(months.size > 1){
+      errorEl.textContent = "⚠️ All sessions in a pass must fall within the same calendar month — please adjust your dates.";
+      errorEl.style.display = 'block';
+      return;
+    }
   }
 
   const parentName = document.getElementById('parentName').value.trim();
