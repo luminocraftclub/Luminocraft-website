@@ -126,7 +126,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--teal);}
         <div class="n">Our Ritual</div><div class="price">$52</div><div class="per">2 sessions</div>
       </div>
       <div class="tier-btn" id="tier-3" onclick="selectTier(3)">
-        <div class="n">LM Explorer</div><div class="price">$75</div><div class="per">3 sessions</div>
+        <div class="n" id="tier3Name">LM Explorer</div><div class="price">$75</div><div class="per">3 sessions</div>
       </div>
     </div>
     <div class="muted-note" id="tierExplainer" style="margin-top:.9rem;"></div>
@@ -266,6 +266,13 @@ async function selectProgram(program){
   document.getElementById('infoCard').classList.add('hidden');
   ['tier-1','tier-2','tier-3'].forEach(id=>document.getElementById(id).classList.remove('active'));
 
+  // Play Lab only offers Drop In + a 3-session series (no middle tier),
+  // and its 3-session option is named/behaves differently from Sensory Craft Party's.
+  const isPlayLab = program === 'lumino_play_lab';
+  document.getElementById('tier-2').style.display = isPlayLab ? 'none' : '';
+  document.getElementById('tierCard').querySelector('.tier-grid').style.gridTemplateColumns = isPlayLab ? '1fr 1fr' : '1fr 1fr 1fr';
+  document.getElementById('tier3Name').textContent = isPlayLab ? 'Our Explorers' : 'LM Explorer';
+
   if(!venueOptionsCache[program]){
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/session_dates?select=location_name&program=eq.${program}&date=gte.${getBookableFrom()}`,
@@ -276,17 +283,26 @@ async function selectProgram(program){
   }
 }
 
-const TIER_EXPLAINERS = {
-  1: "<strong>Drop In</strong> (1 session) — at your chosen Lower Mainland location, valid for any scheduled date this month.",
-  2: "<strong>Our Ritual</strong> (2 sessions) — at the <strong>same location</strong>, within this month, at a discount vs. single sessions.",
-  3: "<strong>LM Explorer</strong> (3 sessions) — usable across <strong>any of our participating locations</strong> \u2014 mix and match for full flexibility.",
-};
+function getTierExplainer(tier){
+  const isPlayLab = selectedProgram === 'lumino_play_lab';
+  if(tier === 1) return "<strong>Drop In</strong> (1 session) — at your chosen Lower Mainland location, valid for any scheduled date this month.";
+  if(tier === 2) return "<strong>Our Ritual</strong> (2 sessions) — at the <strong>same location</strong>, within this month, at a discount vs. single sessions.";
+  if(tier === 3 && isPlayLab) return "<strong>Our Explorers</strong> (3-week series) — all three sessions at the <strong>same location</strong>, within this month.";
+  return "<strong>LM Explorer</strong> (3 sessions) — usable across <strong>any of our participating locations</strong> \u2014 mix and match for full flexibility.";
+}
+
+// Whether every session in this pass must be locked to the same single venue
+function requiresSameLocation(){
+  if(selectedTier === 2) return true; // Our Ritual — always same-location, both programs
+  if(selectedTier === 3 && selectedProgram === 'lumino_play_lab') return true; // Our Explorers — same-location
+  return false; // LM Explorer (Sensory Craft Party, tier 3) — free choice across venues
+}
 
 function selectTier(tier){
   selectedTier = tier;
   ['tier-1','tier-2','tier-3'].forEach(id=>document.getElementById(id).classList.remove('active'));
   document.getElementById(`tier-${tier}`).classList.add('active');
-  document.getElementById('tierExplainer').innerHTML = TIER_EXPLAINERS[tier];
+  document.getElementById('tierExplainer').innerHTML = getTierExplainer(tier);
   sessionPicks = Array.from({length: tier}, ()=>({venue:'', date:'', slot_time:''}));
   renderSessionPickers();
   document.getElementById('infoCard').classList.remove('hidden');
@@ -301,7 +317,7 @@ function renderSessionPickers(){
   sessionPicks.forEach((pick, idx)=>{
     const block = document.createElement('div');
     block.className = 'card session-block';
-    const isLockedVenue = (selectedTier === 2 && idx === 1);
+    const isLockedVenue = (requiresSameLocation() && idx > 0);
     block.innerHTML = `
       <div class="label">Session ${idx+1} of ${sessionPicks.length}</div>
       <label>Venue *</label>
@@ -309,7 +325,7 @@ function renderSessionPickers(){
         <option value="">— Select a venue —</option>
         ${venues.map(v=>`<option value="${v}">${v}</option>`).join('')}
       </select>
-      ${isLockedVenue ? '<div class="muted-note">Same location as Session 1 (2-Session Pass requires one location)</div>' : ''}
+      ${isLockedVenue ? '<div class="muted-note">Same location as Session 1 (this pass requires one location)</div>' : ''}
       <label>Date & Time *</label>
       <select id="slot-${idx}" onchange="onSlotChange(${idx})" disabled>
         <option value="">— Select a venue first —</option>
@@ -326,13 +342,15 @@ async function onVenueChange(idx){
   sessionPicks[idx] = { venue, date:'', slot_time:'' };
   await populateSlotDropdown(idx, venue);
 
-  // 2-Session Pass: session 1's venue choice locks session 2's venue too
-  if(selectedTier === 2 && idx === 0){
-    const venueSelect1 = document.getElementById('venue-1');
-    if(venueSelect1){
-      venueSelect1.value = venue;
-      sessionPicks[1] = { venue, date:'', slot_time:'' };
-      await populateSlotDropdown(1, venue);
+  // Same-location passes (Our Ritual, Our Explorers): session 1's venue locks all others
+  if(requiresSameLocation() && idx === 0){
+    for(let i = 1; i < sessionPicks.length; i++){
+      const venueSelectN = document.getElementById(`venue-${i}`);
+      if(venueSelectN){
+        venueSelectN.value = venue;
+        sessionPicks[i] = { venue, date:'', slot_time:'' };
+        await populateSlotDropdown(i, venue);
+      }
     }
   }
 }
