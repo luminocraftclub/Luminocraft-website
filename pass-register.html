@@ -23,11 +23,11 @@ body{font-family:"Nunito",sans-serif;background:var(--bg);color:var(--ink);-webk
 .card{background:var(--white);border:2px solid var(--border);border-radius:var(--rl);padding:1.4rem;margin-bottom:1.2rem;}
 .section-label{font-family:"Fredoka One",cursive;font-size:1rem;color:var(--ink);margin-bottom:.8rem;}
 .program-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;}
-.program-btn{border:2px solid var(--border);border-radius:16px;padding:1rem .7rem;text-align:center;cursor:pointer;background:var(--white);transition:.15s;}
+.program-btn{border:2px solid var(--border);border-radius:16px;padding:.8rem .4rem;text-align:center;cursor:pointer;background:var(--white);transition:.15s;}
 .program-btn.active{border-color:var(--teal);background:var(--teal-l);}
-.program-btn .emoji{font-size:1.7rem;display:block;margin-bottom:.3rem;}
-.program-btn .title{font-weight:800;font-size:.92rem;}
-.program-btn .age{font-size:.78rem;color:var(--muted);}
+.program-btn .emoji{font-size:1.4rem;display:block;margin-bottom:.3rem;}
+.program-btn .title{font-weight:800;font-size:.72rem;line-height:1.2;}
+.program-btn .age{font-size:.7rem;color:var(--muted);}
 .tier-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.7rem;}
 .tier-btn{border:2px solid var(--border);border-radius:16px;padding:.9rem .5rem;text-align:center;cursor:pointer;background:var(--white);transition:.15s;}
 .tier-btn.active{border-color:var(--gold-d);background:var(--gold-l);}
@@ -101,7 +101,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--teal);}
   <!-- STEP 1: PROGRAM -->
   <div class="card">
     <div class="section-label">Which program?</div>
-    <div class="program-grid">
+    <div class="program-grid" style="grid-template-columns:1fr 1fr 1fr;">
       <div class="program-btn" id="btn-sensory" onclick="selectProgram('sensory_craft_party')">
         <span class="emoji">🤲</span>
         <div class="title">Sensory Craft Party</div>
@@ -111,6 +111,11 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--teal);}
         <span class="emoji">🧱</span>
         <div class="title">Lumino Play Lab</div>
         <div class="age">Ages 3–5 (Intro)</div>
+      </div>
+      <div class="program-btn" id="btn-halloween" onclick="selectProgram('halloween_disco')">
+        <span class="emoji">🎃</span>
+        <div class="title">Halloween Sensory & Disco Party</div>
+        <div class="age">Ages 2–5</div>
       </div>
     </div>
   </div>
@@ -132,8 +137,53 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--teal);}
     <div class="muted-note" id="tierExplainer" style="margin-top:.9rem;"></div>
   </div>
 
-  <!-- STEP 3: SESSION PICKERS -->
+  <!-- STEP 3: SESSION PICKERS (Sensory Craft Party / Lumino Play Lab) -->
   <div id="sessionsContainer"></div>
+
+  <!-- STEP 3-ALT: HALLOWEEN EVENT DETAILS (fixed date, no picker) -->
+  <div class="card hidden" id="halloweenCard">
+    <div class="section-label">🎃 Event Details</div>
+    <div style="background:linear-gradient(135deg,#6B4E9E,#4A3670);color:#fff;border-radius:16px;padding:1.1rem;text-align:center;margin-bottom:1rem;">
+      <div style="font-size:1.8rem;">🕺🎃💃</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:1.15rem;margin:.3rem 0;">Sunday, October 25th</div>
+      <div style="font-size:.85rem;opacity:.9;">📍 Flower Dance of Canada, Burnaby</div>
+      <div style="font-size:.85rem;opacity:.9;">🕔 5:00 PM – 7:00 PM</div>
+    </div>
+
+    <div style="background:var(--gold-l);border:2px solid var(--gold-d);border-radius:14px;padding:.8rem 1rem;margin-bottom:1rem;text-align:center;">
+      <span style="font-weight:800;font-size:.85rem;">🎭 Fancy dress is encouraged!</span>
+      <div style="font-size:.78rem;color:var(--muted);margin-top:.2rem;">The best dress will be announced on our Instagram ✨</div>
+    </div>
+
+    <!-- Live capacity banner, matching the style of our regular booking forms -->
+    <div style="border:2px solid var(--border);border-radius:14px;padding:.9rem 1rem;margin-bottom:1.1rem;display:flex;align-items:center;gap:.7rem;">
+      <span style="font-size:1.4rem;">🎃</span>
+      <div style="flex:1;">
+        <div class="cap-line" id="halloweenCapLine" style="margin-top:0;">Checking availability...</div>
+        <div class="cap-bar-wrap" id="halloweenCapBarWrap"><div class="cap-bar" id="halloweenCapBar"></div></div>
+      </div>
+    </div>
+
+    <label>How many children are attending? *</label>
+    <select id="numChildren" onchange="onNumChildrenChange()">
+      <option value="1">1 child</option>
+      <option value="2">2 children</option>
+      <option value="3">3 children</option>
+      <option value="4">4 children</option>
+    </select>
+    <div class="muted-note">Each child comes with 1 accompanying adult included — $35 per child+adult pair.</div>
+
+    <div id="halloweenChildrenContainer"></div>
+
+    <label>Extra Adults <span style="font-weight:400;color:var(--muted);">(beyond the 1 included per child)</span></label>
+    <select id="extraAdults" onchange="updateTotal()">
+      <option value="0">0 extra adults</option>
+      <option value="1">1 extra adult (+$10)</option>
+      <option value="2">2 extra adults (+$20)</option>
+      <option value="3">3 extra adults (+$30)</option>
+      <option value="4">4 extra adults (+$40)</option>
+    </select>
+  </div>
 
   <!-- STEP 4: FAMILY INFO -->
   <div class="card hidden" id="infoCard">
@@ -148,11 +198,13 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--teal);}
     <label>Email *</label>
     <input type="email" id="email" required/>
 
-    <label>Child's Name *</label>
-    <input type="text" id="childName" required/>
+    <div id="standardChildField">
+      <label>Child's Name *</label>
+      <input type="text" id="childName" required/>
 
-    <label>Child's Date of Birth *</label>
-    <input type="date" id="childDob" required/>
+      <label>Child's Date of Birth *</label>
+      <input type="date" id="childDob" required/>
+    </div>
 
     <label>Allergies or Accessibility Needs</label>
     <textarea id="notes" rows="3" placeholder="Let us know about any allergies, sensory sensitivities, or anything helpful for us to know..."></textarea>
@@ -259,12 +311,28 @@ async function selectProgram(program){
   selectedProgram = program;
   document.getElementById('btn-sensory').classList.toggle('active', program==='sensory_craft_party');
   document.getElementById('btn-playlab').classList.toggle('active', program==='lumino_play_lab');
-  document.getElementById('tierCard').classList.remove('hidden');
+  document.getElementById('btn-halloween').classList.toggle('active', program==='halloween_disco');
   selectedTier = null;
   sessionPicks = [];
   document.getElementById('sessionsContainer').innerHTML = '';
   document.getElementById('infoCard').classList.add('hidden');
+  document.getElementById('halloweenCard').classList.add('hidden');
   ['tier-1','tier-2','tier-3'].forEach(id=>document.getElementById(id).classList.remove('active'));
+
+  if(program === 'halloween_disco'){
+    document.getElementById('tierCard').classList.add('hidden');
+    document.getElementById('halloweenCard').classList.remove('hidden');
+    document.getElementById('infoCard').classList.remove('hidden');
+    document.getElementById('standardChildField').style.display = 'none';
+    document.getElementById('numChildren').value = '1';
+    onNumChildrenChange();
+    checkHalloweenCapacity();
+    updateTotal();
+    return;
+  }
+
+  document.getElementById('standardChildField').style.display = '';
+  document.getElementById('tierCard').classList.remove('hidden');
 
   // Play Lab only offers Drop In + a 3-session series (no middle tier),
   // and its 3-session option is named/behaves differently from Sensory Craft Party's.
@@ -280,6 +348,73 @@ async function selectProgram(program){
     );
     const rows = await res.json();
     venueOptionsCache[program] = [...new Set((rows||[]).map(r=>r.location_name))];
+  }
+}
+
+function onNumChildrenChange(){
+  const num = Number(document.getElementById('numChildren').value);
+  const container = document.getElementById('halloweenChildrenContainer');
+
+  // Preserve any already-entered values when the count changes
+  const existing = [];
+  container.querySelectorAll('.hw-child-block').forEach((block, i) => {
+    existing.push({
+      name: block.querySelector('.hw-child-name')?.value || '',
+      dob: block.querySelector('.hw-child-dob')?.value || '',
+    });
+  });
+
+  container.innerHTML = '';
+  for(let i = 0; i < num; i++){
+    const prev = existing[i] || { name: '', dob: '' };
+    const block = document.createElement('div');
+    block.className = 'hw-child-block';
+    block.style.cssText = 'border:2px dashed var(--border);border-radius:14px;padding:.9rem;margin-top:.8rem;';
+    block.innerHTML = `
+      <div style="font-weight:800;font-size:.82rem;color:var(--orange-d, var(--teal-d));margin-bottom:.5rem;">Child ${i+1}</div>
+      <label style="margin-top:0;">Child's Name *</label>
+      <input type="text" class="hw-child-name" value="${prev.name}"/>
+      <label>Child's Date of Birth *</label>
+      <input type="date" class="hw-child-dob" value="${prev.dob}"/>
+    `;
+    container.appendChild(block);
+  }
+  updateTotal();
+}
+
+async function checkHalloweenCapacity(){
+  const capLine = document.getElementById('halloweenCapLine');
+  const capBarWrap = document.getElementById('halloweenCapBarWrap');
+  const capBar = document.getElementById('halloweenCapBar');
+  capLine.textContent = "Checking availability...";
+  capBarWrap.style.display = "block";
+  const maxCapacity = 15; // fixed for this event, independent of the venue's regular session capacity
+
+  try{
+    const countRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_slot_count`, {
+      method: "POST",
+      headers:{ apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ p_preferred_date: "2026-10-25 5:00 PM - 7:00 PM" })
+    });
+    const count = await countRes.json();
+    const remaining = maxCapacity - count;
+    const pct = Math.min((count / maxCapacity) * 100, 100);
+    capBar.style.width = pct + "%";
+
+    if(remaining <= 0){
+      capLine.innerHTML = `<span style="color:#B23A3A;">Fully booked! Email luminocraftclub@gmail.com to be added to the waitlist.</span>`;
+      capBar.style.background = "#E88";
+      document.getElementById('submitBtn').disabled = true;
+    } else if(remaining <= 3){
+      capLine.innerHTML = `<span style="color:#C8980A;">${remaining} spot${remaining===1?"":"s"} left!</span>`;
+      capBar.style.background = "linear-gradient(90deg,#F5C842,#C8980A)";
+    } else {
+      capLine.innerHTML = `${remaining} of ${maxCapacity} spots available`;
+      capBar.style.background = "linear-gradient(90deg,#3BBFB8,#2A9E98)";
+    }
+  } catch(e){
+    capLine.textContent = "";
+    capBarWrap.style.display = "none";
   }
 }
 
@@ -520,8 +655,15 @@ function selectConsent(el, value){
 }
 
 function updateTotal(){
-  const amt = selectedTier ? TIER_PRICES[selectedTier] : 0;
-  document.getElementById('totalAmt').textContent = `$${(amt/100).toFixed(0)}`;
+  let amtCents;
+  if(selectedProgram === 'halloween_disco'){
+    const numChildren = Number(document.getElementById('numChildren')?.value || 1);
+    const extra = Number(document.getElementById('extraAdults')?.value || 0);
+    amtCents = (numChildren * 3500) + (extra * 1000);
+  } else {
+    amtCents = selectedTier ? TIER_PRICES[selectedTier] : 0;
+  }
+  document.getElementById('totalAmt').textContent = `$${(amtCents/100).toFixed(0)}`;
 }
 
 async function handleSubmit(){
@@ -529,46 +671,73 @@ async function handleSubmit(){
   errorEl.style.display = 'none';
   const btn = document.getElementById('submitBtn');
 
-  if(!selectedProgram || !selectedTier){
-    errorEl.textContent = "⚠️ Please choose a program and a session pass above.";
+  if(!selectedProgram){
+    errorEl.textContent = "⚠️ Please choose a program above.";
     errorEl.style.display = 'block';
     return;
   }
 
-  const seen = new Set();
-  for(const pick of sessionPicks){
-    if(!pick.venue || !pick.date || !pick.slot_time){
-      errorEl.textContent = "⚠️ Please select a venue and date/time for every session (or join the waitlist for any full sessions).";
-      errorEl.style.display = 'block';
-      return;
-    }
-    const key = `${pick.venue}|${pick.date}|${pick.slot_time}`;
-    if(seen.has(key)){
-      errorEl.textContent = "⚠️ You've picked the same session twice — please choose different sessions.";
-      errorEl.style.display = 'block';
-      return;
-    }
-    seen.add(key);
+  const isHalloween = selectedProgram === 'halloween_disco';
+
+  if(!isHalloween && !selectedTier){
+    errorEl.textContent = "⚠️ Please choose a session pass above.";
+    errorEl.style.display = 'block';
+    return;
   }
 
-  if(sessionPicks.length > 1){
-    const months = new Set(sessionPicks.map(p => p.date.slice(0,7)));
-    if(months.size > 1){
-      errorEl.textContent = "⚠️ All sessions in a pass must fall within the same calendar month — please adjust your dates.";
-      errorEl.style.display = 'block';
-      return;
+  if(!isHalloween){
+    const seen = new Set();
+    for(const pick of sessionPicks){
+      if(!pick.venue || !pick.date || !pick.slot_time){
+        errorEl.textContent = "⚠️ Please select a venue and date/time for every session (or join the waitlist for any full sessions).";
+        errorEl.style.display = 'block';
+        return;
+      }
+      const key = `${pick.venue}|${pick.date}|${pick.slot_time}`;
+      if(seen.has(key)){
+        errorEl.textContent = "⚠️ You've picked the same session twice — please choose different sessions.";
+        errorEl.style.display = 'block';
+        return;
+      }
+      seen.add(key);
+    }
+
+    if(sessionPicks.length > 1){
+      const months = new Set(sessionPicks.map(p => p.date.slice(0,7)));
+      if(months.size > 1){
+        errorEl.textContent = "⚠️ All sessions in a pass must fall within the same calendar month — please adjust your dates.";
+        errorEl.style.display = 'block';
+        return;
+      }
     }
   }
 
   const parentName = document.getElementById('parentName').value.trim();
   const phone = document.getElementById('phone').value.trim();
   const email = document.getElementById('email').value.trim();
-  const childName = document.getElementById('childName').value.trim();
-  const childDob = document.getElementById('childDob').value;
   const notes = document.getElementById('notes').value.trim();
   const waiver = document.getElementById('waiver').checked;
 
-  if(!parentName || !phone || !email || !childName || !childDob){
+  let childName = '', childDob = '', halloweenChildren = [];
+
+  if(isHalloween){
+    const blocks = document.querySelectorAll('#halloweenChildrenContainer .hw-child-block');
+    for(const block of blocks){
+      const name = block.querySelector('.hw-child-name').value.trim();
+      const dob = block.querySelector('.hw-child-dob').value;
+      if(!name || !dob){
+        errorEl.textContent = "⚠️ Please fill in every child's name and date of birth.";
+        errorEl.style.display = 'block';
+        return;
+      }
+      halloweenChildren.push({ name, dob });
+    }
+  } else {
+    childName = document.getElementById('childName').value.trim();
+    childDob = document.getElementById('childDob').value;
+  }
+
+  if(!parentName || !phone || !email || (!isHalloween && (!childName || !childDob))){
     errorEl.textContent = "⚠️ Please fill in all required fields.";
     errorEl.style.display = 'block';
     return;
@@ -587,7 +756,17 @@ async function handleSubmit(){
   btn.disabled = true;
   btn.textContent = "Redirecting to payment...";
 
-  const payload = {
+  const endpoint = isHalloween ? 'create-event-payment' : 'pass-payment';
+  const payload = isHalloween ? {
+    parent_name: parentName,
+    phone_number: phone,
+    email: email,
+    children: halloweenChildren,
+    extra_adults: Number(document.getElementById('extraAdults').value),
+    allergies_notes: notes,
+    waiver_accepted: waiver,
+    photo_consent: photoConsentValue,
+  } : {
     program: selectedProgram,
     tier: selectedTier,
     parent_name: parentName,
@@ -602,7 +781,7 @@ async function handleSubmit(){
   };
 
   try{
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/pass-payment`, {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/${endpoint}`, {
       method: "POST",
       headers:{
         apikey: SUPABASE_KEY,
