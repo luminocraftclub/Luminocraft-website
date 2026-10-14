@@ -134,6 +134,17 @@ section{padding:4rem 1.5rem 6rem;position:relative;}
 .filter-pill:hover{border-color:var(--teal);color:var(--teal-d);}
 .filter-pill.active{background:var(--teal);border-color:var(--teal);color:#fff;box-shadow:0 4px 12px rgba(59,191,184,.35);}
 .product-card.filtered-out{display:none;}
+.gallery-track{display:flex;width:100%;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.gallery-track::-webkit-scrollbar{display:none;}
+.gallery-track img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;scroll-snap-align:start;}
+.g-arrow{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;
+  border:none;background:rgba(255,255,255,.9);color:var(--teal-d);font-size:1.1rem;font-weight:800;
+  cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2);z-index:2;display:flex;align-items:center;justify-content:center;}
+.g-arrow.prev{left:.6rem;} .g-arrow.next{right:.6rem;}
+.g-dots{position:absolute;bottom:.7rem;left:0;right:0;display:flex;justify-content:center;gap:.4rem;z-index:2;pointer-events:none;}
+.g-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.6);box-shadow:0 1px 3px rgba(0,0,0,.35);transition:all .2s;}
+.g-dot.active{background:#fff;transform:scale(1.25);}
 
 /* ══ SHOP GRID ══ */
 .cat-section{background:#F8FFFE;}
@@ -386,7 +397,7 @@ async function loadCatalog(){
       .filter(r => r.title && r.type && r.price_cents > 0)
       .map(r => ({
         id:r.id, title:r.title, price:r.price_cents/100, type:r.type, theme:r.theme||"",
-        img:r.image_url||"", tagline:r.tagline||"", desc:r.description||"", stock:r.stock||0
+        img:r.image_url||"", images:Array.isArray(r.images)?r.images:[], tagline:r.tagline||"", desc:r.description||"", stock:r.stock||0
       }));
     PRODUCTS.forEach(p=>selectedQty[p.id]=1);
     renderCatalog();
@@ -408,10 +419,17 @@ function productCard(p, type){
     : p.stock<=2 ? `<span class="stock-pill low">Only ${p.stock} left</span>`
     : `<span class="stock-pill">${p.stock} in stock</span>`;
   const tags = (type.benefits||[]).map(t=>`<span class="ptag">${esc(t)}</span>`).join("");
+  const gallery = [p.img, ...(p.images||[])].filter(Boolean);
+  const imgArea = gallery.length > 1
+    ? `<div class="gallery-track">${gallery.map((u,i)=>`<img src="${esc(u)}" alt="${esc(p.title)} — photo ${i+1}" loading="lazy"/>`).join("")}</div>
+       <button class="g-arrow prev" aria-label="Previous photo">‹</button>
+       <button class="g-arrow next" aria-label="Next photo">›</button>
+       <div class="g-dots">${gallery.map((u,i)=>`<span class="g-dot${i===0?" active":""}"></span>`).join("")}</div>`
+    : `<img src="${esc(p.img)}" alt="${esc(p.title)}" loading="lazy"/>`;
   return `
     <div class="product-card" id="card-${esc(p.id)}" data-theme="${esc(p.theme)}">
       <div class="product-img-wrap">
-        <img src="${esc(p.img)}" alt="${esc(p.title)}" loading="lazy"/>
+        ${imgArea}
         ${stockLabel}
       </div>
       <div class="product-body">
@@ -489,6 +507,18 @@ function renderCatalog(){
         });
       });
     }
+  });
+
+  root.querySelectorAll(".product-img-wrap").forEach(wrap=>{
+    const track = wrap.querySelector(".gallery-track");
+    if(!track) return;
+    const dots = wrap.querySelectorAll(".g-dot");
+    track.addEventListener("scroll", ()=>{
+      const i = Math.round(track.scrollLeft / track.clientWidth);
+      dots.forEach((d,k)=>d.classList.toggle("active", k===i));
+    }, {passive:true});
+    wrap.querySelector(".g-arrow.prev").addEventListener("click", ()=>track.scrollBy({left:-track.clientWidth, behavior:"smooth"}));
+    wrap.querySelector(".g-arrow.next").addEventListener("click", ()=>track.scrollBy({left: track.clientWidth, behavior:"smooth"}));
   });
 
   root.querySelectorAll(".reveal").forEach(el=>ro.observe(el));
